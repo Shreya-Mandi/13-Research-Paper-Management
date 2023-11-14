@@ -1,5 +1,24 @@
 API:
 
+0. "http://localhost:3002/Setup/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+0. "http://localhost:3002/Cleanup/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
 1. "http://localhost:3002/Login/"
     method: POST
 
@@ -60,7 +79,7 @@ API:
 
     request:
     {
-        id : String,
+        id : String / "",
         type : "student" / "faculty"
     }
 
@@ -99,7 +118,7 @@ API:
         projectTitle : String,
         projectStatus : "Published" / "Ongoing",
         startDate : Date (YYYY-MM-DD),
-        endDate : Date (YYYY-MM-DD) / Null,
+        endDate : Date (YYYY-MM-DD) / "",
         facultyID : [ String ]
         studentID : [ String ]
     }
@@ -130,7 +149,7 @@ API:
                       projectTitle : String,
                       projectStatus : "Published" / "Ongoing",
                       startDate : Date (YYYY-MM-DD),
-                      endDate : Date (YYYY-MM-DD) / Null,
+                      endDate : Date (YYYY-MM-DD) / "",
                       faculty : [
                                     {
                                         id : String,
