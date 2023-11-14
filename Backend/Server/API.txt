@@ -1,0 +1,236 @@
+API:
+
+1. "http://localhost:3002/Login/"
+    method: POST
+
+    request:
+    {
+        id : String,
+        pwd : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+        found : true / false,
+        valid : true / false,
+        type : "student" / "faculty"
+    }
+
+
+2. "http://localhost:3002/Register/"
+    method: POST
+
+    request:
+    {
+        id : String,
+        pwd : String,
+        type : "student" / "faculty",
+
+        details: {
+                     firstName : String,
+                     lastName : String,
+                     dept : "CSE" / "ECE" / "EEE" / "AIML" / "ME",
+                     sem : Int,
+                     sec : Char
+                 }
+
+            (or)    (above is for student, below is for faculty)
+
+        details: {
+                     firstName : String,
+                     lastName : String,
+                     dept : "CSE" / "ECE" / "EEE" / "AIML" / "ME"
+                     domain : String
+                 }
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+3. "http://localhost:3002/GetProjects/"
+    method: POST
+
+    request:
+    {
+        id : String,
+        type : "student" / "faculty"
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+        projects : [
+                       {
+                           projectID : String,
+                           projectTitle : String,
+                           projectStatus : "Published" / "Ongoing",
+                           faculty : [
+                                         {
+                                             id : String,
+                                             name : String
+                                         }, ...
+                                     ]
+                           student : [
+                                         {
+                                             id : String,
+                                             name : String
+                                         }, ...
+                                     ]
+                       }, ...
+                   ]
+    }
+
+
+4. "http://localhost:3002/NewProject/"
+    method: POST
+
+    request:
+    {
+        projectTitle : String,
+        projectStatus : "Published" / "Ongoing",
+        startDate : Date (YYYY-MM-DD),
+        endDate : Date (YYYY-MM-DD) / Null,
+        facultyID : [ String ]
+        studentID : [ String ]
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+5. "https://localhost:3002/GetProject/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        details : {
+                      projectTitle : String,
+                      projectStatus : "Published" / "Ongoing",
+                      startDate : Date (YYYY-MM-DD),
+                      endDate : Date (YYYY-MM-DD) / Null,
+                      faculty : [
+                                    {
+                                        id : String,
+                                        name : String,
+                                    }, ...
+                                ]
+                      student : [
+                                    {
+                                        id : String,
+                                        name : String
+                                    }, ...
+                                ],
+                      suggestions : [
+                                        {
+                                            name : String,
+                                            msg : String,
+                                            time : Timestamp (YYYY-MM-DD hh:mm:ss)
+                                        }, ...
+                                    ]
+                      meetings : [
+                                     {
+                                         id : Int,
+                                         startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                                         endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                                         link : String,
+                                         status : "Accepted", "Rejected", "Requested",
+                                         remarks : String
+                                     }
+                                 ]
+                  }
+    }
+
+
+6. "https://locahost:3002/NewMeeting/"
+    method: POST
+
+    request:
+    {
+        projectID : Int,
+        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        link : String,
+        remarks : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+7. "https://localhost:3002/AckMeeting/"
+    method: POST
+
+    request:
+    {
+        meetingID : Int,
+        status : "Accepted" / "Rejected"
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+## -- TODO LATER -- ##
+
+8. "https://localhost:3002/UploadPaper/"
+    method: POST
+
+    request:
+    {
+        ???
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+    }
+
+
+9. "https://localhost:3002/DownloadPaper/"
+    method: ???
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        ???
+    }
