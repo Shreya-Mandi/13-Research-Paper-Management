@@ -1,6 +1,27 @@
 API:
 
-0. "http://localhost:3002/Setup/"
+0. "http://localhost:3002/NewDb/"
+0. "http://localhost:3002/InsDb/"
+0. "http://localhost:3002/ClsDb/"
+0. "http://localhost:3002/DelDb/"
+
+1. "http://localhost:3002/Login/"
+2. "http://localhost:3002/Register/"
+
+c
+4. "http://localhost:3002/NewProject/"
+5. "http://localhost:3002/GetProject/"
+6. "http://localhost:3002/UpdProject/"
+7. "http://localhost:3002/DelProject/"
+
+8. "http://localhost:3002/NewMeeting/"
+9. "http://localhost:3002/GetMeetings/"
+10. "http://localhost:3002/UpdMeeting"
+
+11. "http://localhost:3002/NewSuggestion"
+12. "http://localhost:3002/GetSuggestions"
+
+0. "http://localhost:3002/NewDb/"
     method: GET
 
     response:
@@ -9,7 +30,28 @@ API:
         errMsg : String
     }
 
-0. "http://localhost:3002/Cleanup/"
+
+0. "http://localhost:3002/InsDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+0. "http://localhost:3002/ClsDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+0. "http://localhost:3002/DelDb/"
     method: GET
 
     response:
@@ -33,9 +75,10 @@ API:
         invalidRequest : true / false,
         status : true / false,
         errMsg : String,
-        found : true / false,
+
         valid : true / false,
-        type : "student" / "faculty"
+        type : "student" / "faculty",
+        name : String
     }
 
 
@@ -48,6 +91,7 @@ API:
         pwd : String,
         type : "student" / "faculty",
 
+        (if type == "student")
         details: {
                      firstName : String,
                      lastName : String,
@@ -56,8 +100,7 @@ API:
                      sec : Char
                  }
 
-            (or)    (above is for student, below is for faculty)
-
+        (if type == "faculty")
         details: {
                      firstName : String,
                      lastName : String,
@@ -79,8 +122,10 @@ API:
 
     request:
     {
-        id : String / "",
-        type : "student" / "faculty"
+        type : "student" / "faculty" / "guest",
+
+        (if type == "guest", dont put id)
+        id : String
     }
 
     response:
@@ -88,6 +133,7 @@ API:
         invalidRequest : true / false,
         status : true / false,
         errMsg : String,
+
         projects : [
                        {
                            projectID : String,
@@ -130,46 +176,8 @@ API:
         errMsg : String
     }
 
-5. "http://locahost:3002/UpdProject/"
-    method: POST
 
-    request:
-    {
-        projectId : Int,
-
-        (the following parameters are optional)
-
-        projectTitle : String,
-        projectStatus : "Published" / "Ongoing",
-        endDate : Date (YYYY-MM-DD),
-        facultyID : [ String ]
-        studentID : [ String ]
-    }
-
-    response:
-    {
-        invalidRequest : true / false,
-        status : true / false,
-        errMsg : String
-    }
-
-
-6. "https://localhost:3002/DelProject/"
-    method: POST
-
-    request:
-    {
-        projectId : Int
-    }
-
-    response:
-    {
-        invalidRequest : true / false,
-        status : true / false,
-        errMsg : String
-    }
-
-7. "https://localhost:3002/GetProject/"
+5. "http://localhost:3002/GetProject/"
     method: POST
 
     request:
@@ -200,28 +208,51 @@ API:
                                         name : String
                                     }, ...
                                 ],
-                      suggestions : [
-                                        {
-                                            name : String,
-                                            msg : String,
-                                            time : Timestamp (YYYY-MM-DD hh:mm:ss)
-                                        }, ...
-                                    ]
-                      meetings : [
-                                     {
-                                         id : Int,
-                                         startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
-                                         endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
-                                         link : String,
-                                         status : "Accepted", "Rejected", "Requested",
-                                         remarks : String
-                                     }
-                                 ]
                   }
     }
 
 
-8. "https://locahost:3002/NewMeeting/"
+6. "http://localhost:3002/UpdProject/"
+    method: POST
+
+    request:
+    {
+        projectId : Int,
+
+        (the following parameters are optional)
+
+        projectTitle : String,
+        projectStatus : "Published" / "Ongoing",
+        endDate : Date (YYYY-MM-DD),
+        facultyID : [ String ]
+        studentID : [ String ]
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+7. "http://localhost:3002/DelProject/"
+    method: POST
+
+    request:
+    {
+        projectId : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+8. "http://localhost:3002/NewMeeting/"
     method: POST
 
     request:
@@ -241,7 +272,34 @@ API:
     }
 
 
-9. "https://localhost:3002/UpdMeeting"
+9. "http://localhost:3002/GetMeetings/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        meetings : [
+                       {
+                        id : Int,
+                        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                        link : String,
+                        status : "Accepted", "Rejected", "Requested",
+                        remarks : String
+                       }, ...
+                   ]
+    }
+
+
+10. "http://localhost:3002/UpdMeeting"
     method: POST
 
     request:
@@ -250,6 +308,7 @@ API:
 
         (the following parameters are optional)
 
+        status : "Accepted" / "Rejected" / "Requested",
         startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
         endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
         link : String,
@@ -264,13 +323,14 @@ API:
     }
 
 
-10. "https://localhost:3002/AckMeeting/"
+11. "http://localhost:3002/NewSuggestion"
     method: POST
 
     request:
     {
-        meetingID : Int,
-        status : "Accepted" / "Rejected"
+        projectID : Int,
+        facultyID : String,
+        suggestion : String
     }
 
     response:
@@ -280,9 +340,35 @@ API:
         errMsg : String
     }
 
+
+12. "http://localhost:3002/GetSuggestions"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        suggestions : [
+                          {
+                              id : String,
+                              name : String,
+                              msg : String,
+                              time : Timestamp (YYYY-MM-DD hh:mm:ss)
+                          }, ...
+                      ]
+    }
+
+
 ## -- TODO LATER -- ##
 
-11. "https://localhost:3002/UploadPaper/"
+13. "https://localhost:3002/UploadPaper/"
     method: POST
 
     request:
@@ -298,7 +384,7 @@ API:
     }
 
 
-12. "https://localhost:3002/DownloadPaper/"
+14. "https://localhost:3002/DownloadPaper/"
     method: ???
 
     request:
