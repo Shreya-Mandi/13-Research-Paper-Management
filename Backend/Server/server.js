@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const mysql = require('mysql2');
 const PORT = 3002;
 
 StartService();
@@ -14,8 +15,27 @@ async function StartService() {
         app.use(express.json());
         app.use(express.urlencoded({extended: true}));
 
+        app.get('/NewDb/', handleTemplate);
+        app.get('/InsDb/', handleTemplate);
+        app.get('/ClsDb/', handleTemplate);
+        app.get('/DelDb/', handleTemplate);
+
         app.post('/Login/', handleLogin);
         app.post('/Register/', handleRegister);
+
+        app.post('/GetProjects/', handleTemplate);
+
+        app.post('/NewProject/', handleTemplate);
+        app.post('/GetProject/', handleTemplate);
+        app.post('/UpdProject/', handleTemplate);
+        app.post('/DelProject/', handleTemplate);
+
+        app.post('/NewMeeting/', handleTemplate);
+        app.post('/GetMeetings/', handleTemplate);
+        app.post('/UpdMeeting/', handleTemplate);
+
+        app.post('/NewSuggestions/', handleTemplate);
+        app.post('/GetSuggestions/', handleTemplate);
 
         console.log("Set up express.")
 
@@ -77,6 +97,27 @@ async function handleRegister(req, res) {
         let response = {
             status: true
         }
+
+        console.log("Sending, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleTemplate(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        // TODO Validate Request
+        let invalid_request = false;
+        if (invalid_request) {
+            res.send({invalidRequest: true, status: false, errMsg: "refer API properly"});
+        }
+
+        // TODO MySql interaction
+        let response = {status: true};
 
         console.log("Sending, ", response);
         res.send(response);
