@@ -179,13 +179,18 @@ VALUES ('DOI001', 'John', 'Doe'),
 
 INSERT INTO literature_survey_datasets
 VALUES ('DOI001', 'Dataset 1'),
+       ('DOI001', 'Dataset 9'),
        ('DOI002', 'Dataset 2'),
        ('DOI003', 'Dataset 3'),
+       ('DOI003', 'Dataset 10'),
+       ('DOI003', 'Dataset 11'),
        ('DOI004', 'Dataset 4'),
        ('DOI005', 'Dataset 5'),
        ('DOI006', 'Dataset 6'),
+       ('DOI006', 'Dataset 12'),
        ('DOI007', 'Dataset 7'),
-       ('DOI008', 'Dataset 8');
+       ('DOI008', 'Dataset 8'),
+       ('DOI008', 'Dataset 13');
 
 
 INSERT INTO paper_refs_literature_survey
