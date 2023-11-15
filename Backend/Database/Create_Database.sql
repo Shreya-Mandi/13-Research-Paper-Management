@@ -30,10 +30,11 @@ CREATE TABLE meeting
 (
     `ID`         INT PRIMARY KEY,
     `Paper_ID`   INT                                        NOT NULL,
-    `Start_Time` TIMESTAMP                                  NOT NULL,
-    `End_Time`   TIMESTAMP                                  NOT NULL,
+    `Start_Time` DATETIME                                   NOT NULL,
+    `End_Time`   DATETIME                                   NOT NULL,
     `Link`       VARCHAR(255) UNIQUE                        NOT NULL,
-    `Status`     ENUM ('Accepted', 'Rejected', 'Requested') NOT NULL,
+    `Status`     ENUM ('Accepted', 'Rejected', 'Requested') NOT NULL DEFAULT 'Requested',
+    `Remarks`    VARCHAR(255)                               NOT NULL,
     CONSTRAINT FK_meeting_paper_id FOREIGN KEY (Paper_ID) REFERENCES paper (ID) ON DELETE CASCADE
 );
 
@@ -44,7 +45,8 @@ CREATE TABLE student
     `Last_Name`  VARCHAR(25)                              NOT NULL,
     `Department` ENUM ('CSE', 'ECE', 'EEE', 'AIML', 'ME') NOT NULL,
     `Semester`   NUMERIC(1)                               NOT NULL,
-    `Section`    CHAR(1)                                  NOT NULL
+    `Section`    CHAR(1)                                  NOT NULL,
+    `Password`   VARCHAR(20)                              NOT NULL
 );
 
 CREATE TABLE student_writes_paper
@@ -62,13 +64,16 @@ CREATE TABLE faculty
     `First_Name` VARCHAR(25)                              NOT NULL,
     `Last_Name`  VARCHAR(25)                              NOT NULL,
     `Department` ENUM ('CSE', 'ECE', 'EEE', 'AIML', 'ME') NOT NULL,
-    `Domain`     VARCHAR(50)                              NOT NULL
+    `Domain`     VARCHAR(50)                              NOT NULL,
+    `Password`   VARCHAR(20)                              NOT NULL
 );
 
 CREATE TABLE faculty_advises_paper
 (
-    `Faculty_ID` CHAR(8),
-    `Paper_ID`   INT,
+    `Faculty_ID`  CHAR(8),
+    `Paper_ID`    INT,
+    `Suggestions` VARCHAR(20) NULL,
+    `Timestamp`   DATETIME    NULL,
     PRIMARY KEY (Faculty_ID, Paper_ID),
     CONSTRAINT FK_faculty_advises_paper_faculty_id FOREIGN KEY (Faculty_ID) REFERENCES faculty (ID) ON DELETE CASCADE,
     CONSTRAINT FK_faculty_advises_paper_paper_id FOREIGN KEY (Paper_ID) REFERENCES paper (ID) ON DELETE CASCADE
