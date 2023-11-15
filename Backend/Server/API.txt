@@ -130,8 +130,46 @@ API:
         errMsg : String
     }
 
+5. "http://locahost:3002/UpdProject/"
+    method: POST
 
-5. "https://localhost:3002/GetProject/"
+    request:
+    {
+        projectId : Int,
+
+        (the following parameters are optional)
+
+        projectTitle : String,
+        projectStatus : "Published" / "Ongoing",
+        endDate : Date (YYYY-MM-DD),
+        facultyID : [ String ]
+        studentID : [ String ]
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+6. "https://localhost:3002/DelProject/"
+    method: POST
+
+    request:
+    {
+        projectId : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+7. "https://localhost:3002/GetProject/"
     method: POST
 
     request:
@@ -183,12 +221,35 @@ API:
     }
 
 
-6. "https://locahost:3002/NewMeeting/"
+8. "https://locahost:3002/NewMeeting/"
     method: POST
 
     request:
     {
         projectID : Int,
+        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        link : String,
+        remarks : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+9. "https://localhost:3002/UpdMeeting"
+    method: POST
+
+    request:
+    {
+        meetingID : Int,
+
+        (the following parameters are optional)
+
         startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
         endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
         link : String,
