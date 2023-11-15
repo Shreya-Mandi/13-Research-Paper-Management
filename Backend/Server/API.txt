@@ -8,7 +8,8 @@ API:
 1. "http://localhost:3002/Login/"
 2. "http://localhost:3002/Register/"
 
-c
+3. "http://localhost:3002/GetProjects/"
+
 4. "http://localhost:3002/NewProject/"
 5. "http://localhost:3002/GetProject/"
 6. "http://localhost:3002/UpdProject/"
@@ -16,10 +17,11 @@ c
 
 8. "http://localhost:3002/NewMeeting/"
 9. "http://localhost:3002/GetMeetings/"
-10. "http://localhost:3002/UpdMeeting"
+10. "http://localhost:3002/UpdMeeting/"
 
-11. "http://localhost:3002/NewSuggestion"
-12. "http://localhost:3002/GetSuggestions"
+11. "http://localhost:3002/NewSuggestion/"
+12. "http://localhost:3002/GetSuggestions/"
+
 
 0. "http://localhost:3002/NewDb/"
     method: GET
@@ -299,7 +301,7 @@ c
     }
 
 
-10. "http://localhost:3002/UpdMeeting"
+10. "http://localhost:3002/UpdMeeting/"
     method: POST
 
     request:
@@ -323,7 +325,7 @@ c
     }
 
 
-11. "http://localhost:3002/NewSuggestion"
+11. "http://localhost:3002/NewSuggestion/"
     method: POST
 
     request:
@@ -365,38 +367,3 @@ c
                       ]
     }
 
-
-## -- TODO LATER -- ##
-
-13. "https://localhost:3002/UploadPaper/"
-    method: POST
-
-    request:
-    {
-        ???
-    }
-
-    response:
-    {
-        invalidRequest : true / false,
-        status : true / false,
-        errMsg : String,
-    }
-
-
-14. "https://localhost:3002/DownloadPaper/"
-    method: ???
-
-    request:
-    {
-        projectID : Int
-    }
-
-    response:
-    {
-        invalidRequest : true / false,
-        status : true / false,
-        errMsg : String,
-
-        ???
-    }
