@@ -264,7 +264,7 @@ API:
     }
 
 
-7. "https://localhost:3002/AckMeeting/"
+10. "https://localhost:3002/AckMeeting/"
     method: POST
 
     request:
@@ -282,7 +282,7 @@ API:
 
 ## -- TODO LATER -- ##
 
-8. "https://localhost:3002/UploadPaper/"
+11. "https://localhost:3002/UploadPaper/"
     method: POST
 
     request:
@@ -298,7 +298,7 @@ API:
     }
 
 
-9. "https://localhost:3002/DownloadPaper/"
+12. "https://localhost:3002/DownloadPaper/"
     method: ???
 
     request:
