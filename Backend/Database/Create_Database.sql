@@ -72,7 +72,7 @@ CREATE TABLE faculty_advises_paper
 (
     `Faculty_ID`  CHAR(8),
     `Paper_ID`    INT,
-    `Suggestions` VARCHAR(20) NULL,
+    `Suggestions` VARCHAR(200) NULL,
     `Timestamp`   DATETIME    NULL,
     PRIMARY KEY (Faculty_ID, Paper_ID),
     CONSTRAINT FK_faculty_advises_paper_faculty_id FOREIGN KEY (Faculty_ID) REFERENCES faculty (ID) ON DELETE CASCADE,
