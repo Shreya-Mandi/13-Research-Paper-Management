@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "sql_test": "node node-sql.js",
     "start": "node server.js"
   },
   "keywords": [],
