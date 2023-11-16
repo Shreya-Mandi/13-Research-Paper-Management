@@ -35,7 +35,7 @@ async function StartService() {
         app.post('/GetProjects/', handleGetProjects);          // working - in-efficient
 
         app.post('/NewProject/', handleTest);
-        app.post('/GetProject/', handleTest);
+        app.post('/GetProject/', handleGetProject);            // working - in-efficient
         app.post('/UpdProject/', handleTest);
         app.post('/DelProject/', handleTest);
 
@@ -266,17 +266,17 @@ async function handleGetProjects(req, res) {
         projects.forEach((item) => {
             switch (req.body.type) {
                 case "student" :
-                    if (item.student.find((element) => element.id === req.body.id) !== undefined){
+                    if (item.student.find((element) => element.id === req.body.id) !== undefined) {
                         projectList.push(item);
                     }
                     break;
                 case "faculty":
-                    if (item.faculty.find((element) => element.id === req.body.id) !== undefined){
+                    if (item.faculty.find((element) => element.id === req.body.id) !== undefined) {
                         projectList.push(item);
                     }
                     break;
                 case "guest":
-                    if (item.projectStatus === "Published"){
+                    if (item.projectStatus === "Published") {
                         projectList.push(item);
                     }
                     break;
@@ -284,6 +284,78 @@ async function handleGetProjects(req, res) {
         })
 
         let response = {status: true, projects: projectList};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleGetProject(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required()
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, projects, students, faculty, _, connection = await getConnection();
+        sqlQuery =
+            `SELECT id         AS projectID,
+                    topic      AS projectTitle,
+                    status     AS projectStatus,
+                    start_date AS startDate,
+                    end_date   AS endDate
+             FROM paper
+             WHERE id = ${req.body.projectID}`;
+        [projects, _] = await connection.query(sqlQuery);
+
+        projects.forEach((item) => {
+            item.faculty = [];
+            item.student = [];
+        });
+
+        sqlQuery =
+            `SELECT t1.paper_id AS projectID, srn AS id, Concat(first_name, ' ', last_name) AS name
+             FROM (SELECT id AS paper_id FROM paper) AS t1
+                      NATURAL JOIN student_writes_paper
+                      NATURAL JOIN student
+             HAVING projectID = ${req.body.projectID}`;
+        [students, _] = await connection.query(sqlQuery);
+
+        students.forEach((item) => {
+            let element = projects.find((element) => element.projectID === item.projectID);
+            element.student.push({id: item.id, name: item.name});
+        });
+
+        sqlQuery =
+            `SELECT DISTINCT t1.paper_id AS projectID, id, Concat(first_name, ' ', last_name) AS name
+             FROM (SELECT id AS paper_id FROM paper) AS t1
+                      NATURAL JOIN (SELECT faculty_id AS id, paper_id FROM faculty_advises_paper) AS t2
+                      NATURAL JOIN faculty
+             HAVING projectID = ${req.body.projectID}`;
+        [faculty, _] = await connection.query(sqlQuery);
+
+        faculty.forEach((item) => {
+            let element = projects.find((element) => element.projectID === item.projectID);
+            element.faculty.push({id: item.id, name: item.name});
+        });
+
+        let response = {status: true, details: (projects[0] !== undefined) ? projects[0] : {}};
 
         console.log("Success, ", response);
         res.send(response);
