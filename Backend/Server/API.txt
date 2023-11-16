@@ -1,19 +1,21 @@
 API:
 
+-1. "http://localhost:3002/Test/"             // working
+
 0. "http://localhost:3002/NewDb/"
 0. "http://localhost:3002/InsDb/"
 0. "http://localhost:3002/ClsDb/"
 0. "http://localhost:3002/DelDb/"
 
-1. "http://localhost:3002/Login/"
-2. "http://localhost:3002/Register/"
+1. "http://localhost:3002/Login/"             // working
+2. "http://localhost:3002/Register/"          // working
 
-3. "http://localhost:3002/GetProjects/"
+3. "http://localhost:3002/GetProjects/"       // working - in-efficient
 
 4. "http://localhost:3002/NewProject/"
-5. "http://localhost:3002/GetProject/"
+5. "http://localhost:3002/GetProject/"        // working - in-efficient
 6. "http://localhost:3002/UpdProject/"
-7. "http://localhost:3002/DelProject/"
+7. "http://localhost:3002/DelProject/"        // working
 
 8. "http://localhost:3002/NewMeeting/"
 9. "http://localhost:3002/GetMeetings/"
@@ -194,6 +196,7 @@ API:
         errMsg : String,
 
         details : {
+                      projectID : Int
                       projectTitle : String,
                       projectStatus : "Published" / "Ongoing",
                       startDate : Date (YYYY-MM-DD),

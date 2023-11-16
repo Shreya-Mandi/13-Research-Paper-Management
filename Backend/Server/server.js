@@ -37,7 +37,7 @@ async function StartService() {
         app.post('/NewProject/', handleTest);
         app.post('/GetProject/', handleGetProject);            // working - in-efficient
         app.post('/UpdProject/', handleTest);
-        app.post('/DelProject/', handleTest);
+        app.post('/DelProject/', handleDelProject);            // working
 
         app.post('/NewMeeting/', handleTest);
         app.post('/GetMeetings/', handleTest);
@@ -356,6 +356,43 @@ async function handleGetProject(req, res) {
         });
 
         let response = {status: true, details: (projects[0] !== undefined) ? projects[0] : {}};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleDelProject(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required()
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, connection = await getConnection();
+        sqlQuery =
+            `DELETE
+             FROM paper
+             WHERE id = ${req.body.projectID}`;
+        await connection.query(sqlQuery);
+
+        let response = {status: true};
 
         console.log("Success, ", response);
         res.send(response);
