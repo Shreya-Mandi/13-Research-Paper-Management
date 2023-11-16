@@ -1,8 +1,16 @@
 const express = require('express');
 const cors = require('cors');
-const PORT = 3002;
+const mysql = require('mysql2/promise');
 
-StartService();
+const PORT = 3002;
+const SQLCONFIG = {
+    host: 'localhost',
+    user: 'root',
+    password: 'sql*db*admin',
+    database: 'research_mgmt'
+};
+
+StartService().then(r => r);
 
 async function StartService() {
     try {
@@ -14,8 +22,28 @@ async function StartService() {
         app.use(express.json());
         app.use(express.urlencoded({extended: true}));
 
-        app.post('/Login/', handleLogin);
+        app.get('/Test/', handleTest);                        // working
+        app.get('/NewDb/', handleTemplate);
+        app.get('/InsDb/', handleTemplate);
+        app.get('/ClsDb/', handleTemplate);
+        app.get('/DelDb/', handleTemplate);
+
+        app.post('/Login/', handleLogin);                // working
         app.post('/Register/', handleRegister);
+
+        app.post('/GetProjects/', handleTemplate);
+
+        app.post('/NewProject/', handleTemplate);
+        app.post('/GetProject/', handleTemplate);
+        app.post('/UpdProject/', handleTemplate);
+        app.post('/DelProject/', handleTemplate);
+
+        app.post('/NewMeeting/', handleTemplate);
+        app.post('/GetMeetings/', handleTemplate);
+        app.post('/UpdMeeting/', handleTemplate);
+
+        app.post('/NewSuggestions/', handleTemplate);
+        app.post('/GetSuggestions/', handleTemplate);
 
         console.log("Set up express.")
 
@@ -25,18 +53,85 @@ async function StartService() {
     }
 }
 
+async function getConnection() {
+    return await mysql.createConnection(SQLCONFIG);
+}
+
+
+async function handleTest(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        let invalid_request = false;
+        // TODO Validate Request
+        if (invalid_request) {
+            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+        }
+
+        // TODO MySql interaction
+        let connection = await getConnection();
+        let [result, fields] = await connection.execute(
+            "select * from paper"
+        );
+
+        let response = {status: result};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
 async function handleLogin(req, res) {
     try {
         console.log("Got request", req.body);
+
+        let invalid_request = false;
         if (!req.body.hasOwnProperty("id") ||
-            !req.body.hasOwnProperty("pwd")) {
-            res.send({invalidRequest: true, status: false, errMsg: "refer API properly"});
+            !req.body.hasOwnProperty("pwd") ||
+            (req.body.id.length !== 8 && req.body.id.length !== 13)) {
+            invalid_request = true;
+        }
+        if (invalid_request) {
+            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
         }
 
-        // TODO mysql read and validate
+        let typeOfUsr = "student";
+        if (req.body.id.length === 8) {
+            typeOfUsr = "faculty";
+        }
+
+        let result, _, connection = await getConnection();
+
+        if (typeOfUsr === "student") {
+            [result, _] = await connection.execute(
+                "select `srn`, `password` from `student` where `srn` = ?",
+                [req.body.id]
+            );
+        } else {
+            [result, _] = await connection.execute(
+                "select `id`, `password` from `faculty` where `id` = ?",
+                [req.body.id]
+            );
+        }
+
         let found = false;
         let valid = false;
-        let typeOfUsr = "student";
+
+        if (result.length !== 0){
+            found = true;
+            let actual_pwd = result[0].password;
+            if (actual_pwd === req.body.pwd){
+                valid = true;
+            }
+        }
 
         let response = {
             status: true,
@@ -45,8 +140,9 @@ async function handleLogin(req, res) {
             type: typeOfUsr
         };
 
-        console.log("Sending, ", response);
+        console.log("Success, ", response);
         res.send(response);
+
     } catch (err) {
         console.log(err, '- Error !!!!!!!!!!!!!!!!');
         res.send({invalidRequest: false, status: false, errMsg: err});
@@ -79,6 +175,29 @@ async function handleRegister(req, res) {
         }
 
         console.log("Sending, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleTemplate(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        let invalid_request = false;
+        // TODO Validate Request
+        if (invalid_request) {
+            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+        }
+
+        // TODO MySql interaction
+        let response = {status: true};
+
+        console.log("Success, ", response);
         res.send(response);
     } catch (err) {
         console.log(err, '- Error !!!!!!!!!!!!!!!!');
