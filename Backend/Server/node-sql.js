@@ -1,31 +1,39 @@
 const express = require('express');
-const mysql = require('mysql2');
-
-const db = mysql.createConnection({
+const mysql = require('mysql2/promise');
+const PORT = 3002;
+const mySqlConfig = {
     host: 'localhost',
     user: 'root',
     password: 'sql*db*admin',
     database: 'research_mgmt'
-});
+};
 
-db.connect((err) => {
-    if (err) {
-        throw err;
+start_service().then(r => r);
+
+async function start_service() {
+    try {
+        const app = express();
+
+        app.get('/', handleGet);
+
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
     }
-    console.log('Connected to database');
-    db.query("select * from paper", function (err, result, fields) {
-        if (err) throw err;
-        console.log(result);
-    });
-});
 
-const app = express();
+}
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+async function handleGet(req, res) {
+    try {
+        let connection = await getConnection();
+        let [result, fields] = await connection.execute("show tables");
+        console.log(result, fields);
+        res.send('Hello World!');
+    } catch (err) {
+        res.send({fail: true});
+    }
+}
 
-const PORT = 3002;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+async function getConnection() {
+    return await mysql.createConnection(mySqlConfig);
+}
