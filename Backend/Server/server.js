@@ -40,11 +40,11 @@ async function StartService() {
         app.post('/DelProject/', handleDelProject);            // working
 
         app.post('/NewMeeting/', handleTest);
-        app.post('/GetMeetings/', handleTest);
+        app.post('/GetMeetings/', handleGetMeetings);          // working
         app.post('/UpdMeeting/', handleTest);
 
         app.post('/NewSuggestions/', handleTest);
-        app.post('/GetSuggestions/', handleTest);
+        app.post('/GetSuggestions/', handleGetSuggestions);    // working
 
         console.log("Set up express.")
 
@@ -129,7 +129,7 @@ async function handleRegister(req, res) {
             firstName: Joi.string().required(),
             lastName: Joi.string().required(),
             dept: Joi.string().valid('CSE', 'ECE', 'EEE', 'AIML', 'ME').insensitive().required(),
-            sem: Joi.number().integer().options({convert: false}).min(1).max(8).required(),
+            sem: Joi.number().integer().min(1).max(8).required(),
             sec: Joi.string().length(1).insensitive().required()
         });
 
@@ -393,6 +393,82 @@ async function handleDelProject(req, res) {
         await connection.query(sqlQuery);
 
         let response = {status: true};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleGetMeetings(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required()
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, meetingList, _, connection = await getConnection();
+        sqlQuery =
+            `SELECT id, start_time AS startTime, end_time AS endTime, link, status, remarks
+             FROM meeting
+             WHERE paper_id = ${req.body.projectID}`;
+        [meetingList, _] = await connection.query(sqlQuery);
+
+        let response = {status: true, meetings: meetingList};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleGetSuggestions(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required()
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, suggestionsList, _, connection = await getConnection();
+        sqlQuery =
+            `SELECT t1.*, Concat(first_name, ' ', last_name) AS name
+             FROM (SELECT faculty_id AS id, suggestions AS msg, timestamp AS time
+                   FROM faculty_advises_paper
+                   WHERE paper_id = ${req.body.projectID}) AS t1
+                      NATURAL JOIN faculty`;
+        [suggestionsList, _] = await connection.query(sqlQuery);
+
+        let response = {status: true, suggestions: suggestionsList};
 
         console.log("Success, ", response);
         res.send(response);

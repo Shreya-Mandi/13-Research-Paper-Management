@@ -18,11 +18,11 @@ API:
 7. "http://localhost:3002/DelProject/"        // working
 
 8. "http://localhost:3002/NewMeeting/"
-9. "http://localhost:3002/GetMeetings/"
+9. "http://localhost:3002/GetMeetings/"       // working
 10. "http://localhost:3002/UpdMeeting/"
 
 11. "http://localhost:3002/NewSuggestion/"
-12. "http://localhost:3002/GetSuggestions/"
+12. "http://localhost:3002/GetSuggestions/"   // working
 
 
 0. "http://localhost:3002/NewDb/"
@@ -346,7 +346,7 @@ API:
     }
 
 
-12. "http://localhost:3002/GetSuggestions"
+12. "http://localhost:3002/GetSuggestions/"
     method: POST
 
     request:
