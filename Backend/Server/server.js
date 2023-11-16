@@ -32,7 +32,7 @@ async function StartService() {
         app.post('/Login/', handleLogin);                      // working
         app.post('/Register/', handleRegister);                // working
 
-        app.post('/GetProjects/', handleTest);
+        app.post('/GetProjects/', handleGetProjects);          // working - in-efficient
 
         app.post('/NewProject/', handleTest);
         app.post('/GetProject/', handleTest);
@@ -194,6 +194,105 @@ async function handleRegister(req, res) {
     }
 }
 
+async function handleGetProjects(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            type: Joi.string().valid("student", "faculty", "guest").required(),
+            id: Joi.string().alphanum().custom((value, helper) => {
+                if (value.length === 8 || value.length === 13) {
+                    return value;
+                } else {
+                    return helper.message("invalid ID");
+                }
+            }).when('type', {
+                is: 'guest',
+                then: Joi.optional(),
+                otherwise: Joi.required()
+            })
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, projects, students, faculty, _, connection = await getConnection();
+        sqlQuery =
+            `SELECT id AS projectID, topic AS projectTitle, status AS projectStatus
+             FROM paper
+             ORDER BY projectID`;
+        [projects, _] = await connection.query(sqlQuery);
+
+        projects.forEach((item) => {
+            item.faculty = [];
+            item.student = [];
+        });
+
+        sqlQuery =
+            `SELECT t1.paper_id AS projectID, srn AS id, Concat(first_name, ' ', last_name) AS name
+             FROM (SELECT id AS paper_id FROM paper) AS t1
+                      NATURAL JOIN student_writes_paper
+                      NATURAL JOIN student`;
+        [students, _] = await connection.query(sqlQuery);
+
+        students.forEach((item) => {
+            let element = projects.find((element) => element.projectID === item.projectID);
+            element.student.push({id: item.id, name: item.name});
+        });
+
+        sqlQuery =
+            `SELECT DISTINCT t1.paper_id AS projectID, id, Concat(first_name, ' ', last_name) AS name
+             FROM (SELECT id AS paper_id FROM paper) AS t1
+                      NATURAL JOIN (SELECT faculty_id AS id, paper_id FROM faculty_advises_paper) AS t2
+                      NATURAL JOIN faculty`;
+        [faculty, _] = await connection.query(sqlQuery);
+
+        faculty.forEach((item) => {
+            let element = projects.find((element) => element.projectID === item.projectID);
+            element.faculty.push({id: item.id, name: item.name});
+        });
+
+        let projectList = [];
+
+        projects.forEach((item) => {
+            switch (req.body.type) {
+                case "student" :
+                    if (item.student.find((element) => element.id === req.body.id) !== undefined){
+                        projectList.push(item);
+                    }
+                    break;
+                case "faculty":
+                    if (item.faculty.find((element) => element.id === req.body.id) !== undefined){
+                        projectList.push(item);
+                    }
+                    break;
+                case "guest":
+                    if (item.projectStatus === "Published"){
+                        projectList.push(item);
+                    }
+                    break;
+            }
+        })
+
+        let response = {status: true, projects: projectList};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
 async function handleTest(req, res) {
     try {
         console.log("Got request", req.body);
@@ -215,9 +314,9 @@ async function handleTest(req, res) {
 
         // TODO MySql interaction
         let result, _, connection = await getConnection();
-        [result, _] = await connection.execute(
-            "SHOW TABLES"
-        );
+        const sqlQuery =
+            `SHOW TABLES`;
+        [result, _] = await connection.query(sqlQuery);
 
         let response = {status: true, result: result};
 
