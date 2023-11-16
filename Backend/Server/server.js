@@ -23,28 +23,28 @@ async function StartService() {
         app.use(express.json());
         app.use(express.urlencoded({extended: true}));
 
-        app.get('/Test/', handleTest);                        // working
-        app.get('/NewDb/', handleTemplate);
-        app.get('/InsDb/', handleTemplate);
-        app.get('/ClsDb/', handleTemplate);
-        app.get('/DelDb/', handleTemplate);
+        app.post('/Test/', handleTest);                        // working
+        app.get('/NewDb/', handleTest);
+        app.get('/InsDb/', handleTest);
+        app.get('/ClsDb/', handleTest);
+        app.get('/DelDb/', handleTest);
 
-        app.post('/Login/', handleLogin);                // working
-        app.post('/Register/', handleRegister);
+        app.post('/Login/', handleLogin);                      // working
+        app.post('/Register/', handleRegister);                // working
 
-        app.post('/GetProjects/', handleTemplate);
+        app.post('/GetProjects/', handleTest);
 
-        app.post('/NewProject/', handleTemplate);
-        app.post('/GetProject/', handleTemplate);
-        app.post('/UpdProject/', handleTemplate);
-        app.post('/DelProject/', handleTemplate);
+        app.post('/NewProject/', handleTest);
+        app.post('/GetProject/', handleTest);
+        app.post('/UpdProject/', handleTest);
+        app.post('/DelProject/', handleTest);
 
-        app.post('/NewMeeting/', handleTemplate);
-        app.post('/GetMeetings/', handleTemplate);
-        app.post('/UpdMeeting/', handleTemplate);
+        app.post('/NewMeeting/', handleTest);
+        app.post('/GetMeetings/', handleTest);
+        app.post('/UpdMeeting/', handleTest);
 
-        app.post('/NewSuggestions/', handleTemplate);
-        app.post('/GetSuggestions/', handleTemplate);
+        app.post('/NewSuggestions/', handleTest);
+        app.post('/GetSuggestions/', handleTest);
 
         console.log("Set up express.")
 
@@ -95,7 +95,6 @@ async function handleLogin(req, res) {
              WHERE ${typeOfId} = '${req.body.id}'`;
         [result, _] = await connection.query(sqlQuery);
 
-
         let valid = false;
         let name = "";
         if (result.length !== 0) {
@@ -126,6 +125,21 @@ async function handleRegister(req, res) {
     try {
         console.log("Got request", req.body);
 
+        const schemaStudent = Joi.object({
+            firstName: Joi.string().required(),
+            lastName: Joi.string().required(),
+            dept: Joi.string().valid('CSE', 'ECE', 'EEE', 'AIML', 'ME').insensitive().required(),
+            sem: Joi.number().integer().options({convert: false}).min(1).max(8).required(),
+            sec: Joi.string().length(1).insensitive().required()
+        });
+
+        const schemaFaculty = Joi.object({
+            firstName: Joi.string().required(),
+            lastName: Joi.string().required(),
+            dept: Joi.string().valid('CSE', 'ECE', 'EEE', 'AIML', 'ME').insensitive().required(),
+            domain: Joi.string().insensitive().required()
+        })
+
         const schema = Joi.object({
             id: Joi.string().alphanum().custom((value, helper) => {
                 if (value.length === 8 || value.length === 13) {
@@ -134,7 +148,13 @@ async function handleRegister(req, res) {
                     return helper.message("invalid ID");
                 }
             }).required(),
-            pwd: Joi.string().min(5).required()
+            pwd: Joi.string().min(5).required(),
+            type: Joi.string().valid('student', 'faculty').required(),
+            details: Joi.when('type', {
+                is: 'student',
+                then: schemaStudent.required(),
+                otherwise: schemaFaculty.required()
+            })
         });
 
         let check = schema.validate(req.body);
@@ -149,38 +169,20 @@ async function handleRegister(req, res) {
             return;
         }
 
-        console.log('passed');
-        let result, _, connection = await getConnection();
+        let connection = await getConnection();
 
-        if (req.body.type === "student") {
-            // [result, _] = await connection.execute(
-            //     "INSERT INTO `student` VALUES (?, ?, ?, ?, ?, ?, ?)",
-            //     [
-            //         req.body.id,
-            //         req.body.details.firstName,
-            //         req.body.details.lastName,
-            //         req.body.details.dept.toUpperCase(),
-            //         req.body.details.sem,
-            //         req.body.details.sec,
-            //         req.body.pwd
-            //     ]
-            // );
-            // console.log(result, _);
-        } else {
-            // [result, _] = await connection.execute(
-            //     "INSERT INTO `faculty` VALUES (?, ?, ?, ?, ?, ?, ?)",
-            //     [
-            //         req.body.id,
-            //         req.body.details.firstName,
-            //         req.body.details.lastName,
-            //         req.body.details.dept.toUpperCase(),
-            //         req.body.details.domain,
-            //         req.body.pwd
-            //     ]
-            // );
-            // console.log(result, _);
-        }
+        const sqlQuery =
+            `INSERT INTO ${req.body.type}
+             VALUES ('${req.body.id}',
+                     '${req.body.details.firstName}',
+                     '${req.body.details.lastName}',
+                     '${req.body.details.dept.toUpperCase()}',` + (
+                (req.body.type === "student") ?
+                    `${req.body.details.sem}, '${req.body.details.sec}',` :
+                    `'${req.body.details.domain}',`
+            ) + `'${req.body.pwd}')`;
 
+        await connection.query(sqlQuery);
         let response = {status: true};
 
         console.log("Success, ", response);
@@ -196,6 +198,7 @@ async function handleTest(req, res) {
     try {
         console.log("Got request", req.body);
 
+        // TODO validate request
         const schema = Joi.object({});
 
         let check = schema.validate(req.body);
@@ -228,28 +231,4 @@ async function handleTest(req, res) {
 
 async function getConnection() {
     return await mysql.createConnection(SQLCONFIG);
-}
-
-async function handleTemplate(req, res) {
-    try {
-        console.log("Got request", req.body);
-
-        let invalid_request = false;
-        // TODO Validate Request
-        if (invalid_request) {
-            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
-            console.log("InvalidRequest, ", response);
-            res.send(response);
-            return;
-        }
-
-        // TODO MySql interaction
-        let response = {status: true};
-
-        console.log("Success, ", response);
-        res.send(response);
-    } catch (err) {
-        console.log(err, '- Error !!!!!!!!!!!!!!!!');
-        res.send({invalidRequest: false, status: false, errMsg: err});
-    }
 }
