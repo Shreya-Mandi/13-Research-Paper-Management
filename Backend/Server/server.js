@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const Joi = require('joi');
 const mysql = require('mysql2/promise');
 
 const PORT = 3002;
@@ -53,51 +54,28 @@ async function StartService() {
     }
 }
 
-async function getConnection() {
-    return await mysql.createConnection(SQLCONFIG);
-}
-
-
-async function handleTest(req, res) {
-    try {
-        console.log("Got request", req.body);
-
-        let invalid_request = false;
-        // TODO Validate Request
-        if (invalid_request) {
-            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
-            console.log("InvalidRequest, ", response);
-            res.send(response);
-        }
-
-        // TODO MySql interaction
-        let connection = await getConnection();
-        let [result, fields] = await connection.execute(
-            "select * from paper"
-        );
-
-        let response = {status: result};
-
-        console.log("Success, ", response);
-        res.send(response);
-    } catch (err) {
-        console.log(err, '- Error !!!!!!!!!!!!!!!!');
-        res.send({invalidRequest: false, status: false, errMsg: err});
-    }
-}
-
 async function handleLogin(req, res) {
     try {
         console.log("Got request", req.body);
 
-        let invalid_request = false;
-        if (!req.body.hasOwnProperty("id") ||
-            !req.body.hasOwnProperty("pwd") ||
-            (req.body.id.length !== 8 && req.body.id.length !== 13)) {
-            invalid_request = true;
-        }
-        if (invalid_request) {
-            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+        const schema = Joi.object({
+            id: Joi.string().alphanum().custom((value, helper) => {
+                if (value.length === 8 || value.length === 13) {
+                    return value;
+                } else {
+                    return helper.message("invalid ID")
+                }
+            }).required(),
+            pwd: Joi.string().min(5).required()
+        })
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
             console.log("InvalidRequest, ", response);
             res.send(response);
             return;
@@ -109,26 +87,24 @@ async function handleLogin(req, res) {
         }
 
         let result, _, connection = await getConnection();
-
         if (typeOfUsr === "student") {
             [result, _] = await connection.execute(
-                "select `srn`, `password` from `student` where `srn` = ?",
+                "SELECT `srn`, `password` FROM `student` WHERE `srn` = ?",
                 [req.body.id]
             );
         } else {
             [result, _] = await connection.execute(
-                "select `id`, `password` from `faculty` where `id` = ?",
+                "SELECT `id`, `password` FROM `faculty` WHERE `id` = ?",
                 [req.body.id]
             );
         }
 
         let found = false;
         let valid = false;
-
-        if (result.length !== 0){
+        if (result.length !== 0) {
             found = true;
             let actual_pwd = result[0].password;
-            if (actual_pwd === req.body.pwd){
+            if (actual_pwd === req.body.pwd) {
                 valid = true;
             }
         }
@@ -152,34 +128,108 @@ async function handleLogin(req, res) {
 async function handleRegister(req, res) {
     try {
         console.log("Got request", req.body);
+
+        let invalid_request = false;
         if (!req.body.hasOwnProperty("id") ||
             !req.body.hasOwnProperty("pwd") ||
-            !req.body.hasOwnProperty("type") ||
-            !(req.body.type.toLowerCase() in ['student', 'faculty']) ||
-            !req.body.hasOwnProperty("details")) {
-            res.send({invalidRequest: true, status: false, errMsg: "refer API properly"});
+            !req.body.hasOwnProperty("type")) {
+            // !(req.body.type.toLowerCase() in ['student', 'faculty'])
+            // !req.body.hasOwnProperty("details") ||
+            // !req.body.details.hasOwnProperty("firstName") ||
+            // !req.body.details.hasOwnProperty("lastName") ||
+            // !req.body.details.hasOwnProperty("dept") ||
+            // !(req.body.details.dept.toLowerCase() in ['cse', 'ece', 'eee', 'aiml', 'me']) ||
+            // (req.body.type === 'student' && (
+            //     !req.body.details.hasOwnProperty("sem") ||
+            //     !req.body.details.hasOwnProperty("sec")
+            // )) ||
+            // (req.body.type === 'faculty' && (
+            //     !req.body.details.hasOwnProperty("domain")
+            // ))) {
+            invalid_request = true;
         }
 
-        let user_details = req.body.details;
-        if (!user_details.hasOwnProperty("firstName") ||
-            !user_details.hasOwnProperty("lastName") ||
-            !user_details.hasOwnProperty("dept") ||
-            !(user_details.dept.toLowerCase() in ['cse', 'ece', 'eee', 'aiml', 'me'])) {
-            res.send({invalidRequest: true, status: false, errMsg: "refer API properly"});
+        if (invalid_request) {
+            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
         }
 
-        // TODO mysql create
+        let result, _, connection = await getConnection();
 
-        let response = {
-            status: true
+        if (req.body.type === "student") {
+            // [result, _] = await connection.execute(
+            //     "INSERT INTO `student` VALUES (?, ?, ?, ?, ?, ?, ?)",
+            //     [
+            //         req.body.id,
+            //         req.body.details.firstName,
+            //         req.body.details.lastName,
+            //         req.body.details.dept.toUpperCase(),
+            //         req.body.details.sem,
+            //         req.body.details.sec,
+            //         req.body.pwd
+            //     ]
+            // );
+            // console.log(result, _);
+            console.log('passed')
+        } else {
+            [result, _] = await connection.execute(
+                "INSERT INTO `faculty` VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    req.body.id,
+                    req.body.details.firstName,
+                    req.body.details.lastName,
+                    req.body.details.dept.toUpperCase(),
+                    req.body.details.domain,
+                    req.body.pwd
+                ]
+            );
+            console.log(result, _);
         }
 
-        console.log("Sending, ", response);
+        let response = {status: true};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch
+        (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleTest(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        let invalid_request = false;
+        // TODO Validate Request
+        if (invalid_request) {
+            let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        // TODO MySql interaction
+        let result, _, connection = await getConnection();
+        [result, _] = await connection.execute(
+            "SHOW TABLES"
+        );
+
+        let response = {status: true, result: result};
+
+        console.log("Success, ", response);
         res.send(response);
     } catch (err) {
         console.log(err, '- Error !!!!!!!!!!!!!!!!');
         res.send({invalidRequest: false, status: false, errMsg: err});
     }
+}
+
+async function getConnection() {
+    return await mysql.createConnection(SQLCONFIG);
 }
 
 async function handleTemplate(req, res) {
@@ -192,6 +242,7 @@ async function handleTemplate(req, res) {
             let response = {invalidRequest: true, status: false, errMsg: "refer API properly"};
             console.log("InvalidRequest, ", response);
             res.send(response);
+            return;
         }
 
         // TODO MySql interaction
