@@ -1,9 +1,10 @@
 CREATE DATABASE research_mgmt;
+
 USE research_mgmt;
 
 CREATE TABLE journal
 (
-    `ID`   INT PRIMARY KEY,
+    `ID`   INT PRIMARY KEY AUTO_INCREMENT,
     `Link` VARCHAR(255) UNIQUE NOT NULL,
     `Rank` DECIMAL(4, 2)       NULL
 );
@@ -18,7 +19,7 @@ CREATE TABLE journal_conferences
 
 CREATE TABLE paper
 (
-    `ID`         INT PRIMARY KEY,
+    `ID`         INT PRIMARY KEY AUTO_INCREMENT,
     `Topic`      VARCHAR(255)                  NOT NULL,
     `Status`     ENUM ('Published', 'Ongoing') NOT NULL DEFAULT 'Ongoing',
     `Start_Date` DATE                          NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE paper
 
 CREATE TABLE meeting
 (
-    `ID`         INT PRIMARY KEY,
+    `ID`         INT PRIMARY KEY AUTO_INCREMENT,
     `Paper_ID`   INT                                        NOT NULL,
     `Start_Time` DATETIME                                   NOT NULL,
     `End_Time`   DATETIME                                   NOT NULL,

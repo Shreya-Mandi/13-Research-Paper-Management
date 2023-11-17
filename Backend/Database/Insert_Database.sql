@@ -44,32 +44,32 @@ VALUES (1, 'Most-Influential nodes in a spacio-temporal network', 'Ongoing', '20
 
 
 INSERT INTO meeting
-VALUES (1, 1, '2023-02-01 10:00:00', '2023-02-01 12:00:00', 'https://meeting1.com', 'Accepted', 'Good presentation'),
-       (2, 2, '2023-03-15 14:00:00', '2023-03-15 16:00:00', 'https://meeting2.com', 'Requested', 'Pending review'),
-       (3, 3, '2023-03-02 11:30:00', '2023-03-02 13:30:00', 'https://meeting3.com', 'Accepted', 'Excellent work'),
-       (4, 4, '2023-09-01 09:30:00', '2023-09-01 11:30:00', 'https://meeting4.com', 'Accepted', 'Great insights'),
-       (5, 5, '2023-08-15 13:00:00', '2023-08-15 15:00:00', 'https://meeting5.com', 'Requested', 'Pending review'),
-       (6, 6, '2023-09-10 11:30:00', '2023-09-10 13:30:00', 'https://meeting6.com', 'Accepted', 'Interesting findings'),
-       (7, 7, '2023-10-05 10:00:00', '2023-10-05 12:00:00', 'https://meeting7.com', 'Requested', 'Awaiting response'),
-       (8, 8, '2023-11-20 14:30:00', '2023-11-20 16:30:00', 'https://meeting8.com', 'Accepted', 'Positive feedback'),
-       (9, 9, '2023-12-10 10:45:00', '2023-12-10 12:45:00', 'https://meeting9.com', 'Requested', 'Pending decision'),
-       (10, 1, '2023-04-05 11:00:00', '2023-04-05 13:00:00', 'https://meeting10.com', 'Accepted', 'Good progress'),
-       (11, 1, '2023-06-15 14:30:00', '2023-06-15 16:30:00', 'https://meeting11.com', 'Rejected', 'Not aligned with project goals'),
-       (12, 2, '2023-05-10 09:00:00', '2023-05-10 11:00:00', 'https://meeting12.com', 'Accepted', 'In-depth discussion'),
-       (13, 2, '2023-07-20 13:30:00', '2023-07-20 15:30:00', 'https://meeting13.com', 'Accepted', 'Promising outcomes'),
-       (14, 3, '2023-08-01 10:15:00', '2023-08-01 12:15:00', 'https://meeting14.com', 'Rejected', 'Insufficient data presented'),
-       (15, 3, '2023-09-25 15:00:00', '2023-09-25 17:00:00', 'https://meeting15.com', 'Accepted', 'Positive feedback on methodology'),
-       (16, 4, '2023-11-10 12:30:00', '2023-11-10 14:30:00', 'https://meeting16.com', 'Requested', 'Pending approval'),
-       (17, 4, '2023-12-05 09:45:00', '2023-12-05 11:45:00', 'https://meeting17.com', 'Accepted', 'Valuable contributions'),
-       (18, 5, '2023-10-20 14:00:00', '2023-10-20 16:00:00', 'https://meeting18.com', 'Rejected', 'Does not align with current focus'),
-       (19, 5, '2023-11-30 11:30:00', '2023-11-30 13:30:00', 'https://meeting19.com', 'Requested', 'Pending response'),
-       (20, 6, '2023-12-15 10:00:00', '2023-12-15 12:00:00', 'https://meeting20.com', 'Accepted', 'Encouraging results'),
-       (21, 6, '2023-01-05 14:30:00', '2023-01-05 16:30:00', 'https://meeting21.com', 'Rejected', 'Not aligned with current priorities'),
-       (22, 7, '2023-02-10 09:00:00', '2023-02-10 11:00:00', 'https://meeting22.com', 'Requested', 'Pending review'),
-       (23, 7, '2023-03-25 13:30:00', '2023-03-25 15:30:00', 'https://meeting23.com', 'Rejected', 'Insufficient details'),
-       (24, 8, '2023-04-20 10:15:00', '2023-04-20 12:15:00', 'https://meeting24.com', 'Accepted', 'Positive feedback on methodology'),
-       (25, 8, '2023-05-25 15:00:00', '2023-05-25 17:00:00', 'https://meeting25.com', 'Requested', 'Pending decision');
-
+VALUES
+       (1, 1, '2023-02-01 10:00:00', '2023-02-01 12:00:00', 'https://meeting1.com', 'Accepted', 'Requesting resources as per requirement. Need guidance on project scope and resources.'),
+       (2, 2, '2023-03-15 14:00:00', '2023-03-15 16:00:00', 'https://meeting2.com', 'Requested', 'Requesting an update on final deliverable and project progress.'),
+       (3, 3, '2023-03-02 11:30:00', '2023-03-02 13:30:00', 'https://meeting3.com', 'Accepted', 'Discussion needed due to insufficient data for ongoing project.'),
+       (4, 4, '2023-09-01 09:30:00', '2023-09-01 11:30:00', 'https://meeting4.com', 'Accepted', 'Interested in discussing and implementing the great insights gathered.'),
+       (5, 5, '2023-08-15 13:00:00', '2023-08-15 15:00:00', 'https://meeting5.com', 'Requested', 'Stuck with machine tool; seeking guidance and solution.'),
+       (6, 6, '2023-09-10 11:30:00', '2023-09-10 13:30:00', 'https://meeting6.com', 'Accepted', 'Excited to discuss and explore interesting findings.'),
+       (7, 7, '2023-10-05 10:00:00', '2023-10-05 12:00:00', 'https://meeting7.com', 'Requested', 'Clarity needed on project scope to align efforts.'),
+       (8, 8, '2023-11-20 14:30:00', '2023-11-20 16:30:00', 'https://meeting8.com', 'Accepted', 'Positive feedback; discussing further improvements.'),
+       (9, 9, '2023-12-10 10:45:00', '2023-12-10 12:45:00', 'https://meeting9.com', 'Requested', 'Align on budget allocation and project priorities.'),
+       (10, 1, '2023-04-05 11:00:00', '2023-04-05 13:00:00', 'https://meeting10.com', 'Accepted', 'Good progress made; providing a progress update.'),
+       (11, 1, '2023-06-15 14:30:00', '2023-06-15 16:30:00', 'https://meeting11.com', 'Rejected', 'Not aligned with project goals; reconsidering approach.'),
+       (12, 2, '2023-05-10 09:00:00', '2023-05-10 11:00:00', 'https://meeting12.com', 'Accepted', 'In-depth discussion needed for project details and direction.'),
+       (13, 2, '2023-07-20 13:30:00', '2023-07-20 15:30:00', 'https://meeting13.com', 'Accepted', 'Reviewing promising outcomes for implementation.'),
+       (14, 3, '2023-08-01 10:15:00', '2023-08-01 12:15:00', 'https://meeting14.com', 'Rejected', 'Insufficient data presented for decision-making.'),
+       (15, 3, '2023-09-25 15:00:00', '2023-09-25 17:00:00', 'https://meeting15.com', 'Accepted', 'Positive feedback on methodology; exploring improvements.'),
+       (16, 4, '2023-11-10 12:30:00', '2023-11-10 14:30:00', 'https://meeting16.com', 'Requested', 'Seeking approval for project extension.'),
+       (17, 4, '2023-12-05 09:45:00', '2023-12-05 11:45:00', 'https://meeting17.com', 'Accepted', 'Considering a change in project direction; discussing implications.'),
+       (18, 5, '2023-10-20 14:00:00', '2023-10-20 16:00:00', 'https://meeting18.com', 'Rejected', 'Not aligning with the current focus; revisiting later.'),
+       (19, 5, '2023-11-30 11:30:00', '2023-11-30 13:30:00', 'https://meeting19.com', 'Requested', 'Discussing team resource allocation and workload balancing.'),
+       (20, 6, '2023-12-15 10:00:00', '2023-12-15 12:00:00', 'https://meeting20.com', 'Accepted', 'Reviewing and implementing encouraging results.'),
+       (21, 6, '2023-01-05 14:30:00', '2023-01-05 16:30:00', 'https://meeting21.com', 'Rejected', 'Not aligned with current priorities; considering future engagement.'),
+       (22, 7, '2023-02-10 09:00:00', '2023-02-10 11:00:00', 'https://meeting22.com', 'Requested', 'Pending review; seeking guidance and direction.'),
+       (23, 7, '2023-03-25 13:30:00', '2023-03-25 15:30:00', 'https://meeting23.com', 'Rejected', 'Insufficient details provided; request more comprehensive information.'),
+       (24, 8, '2023-04-20 10:15:00', '2023-04-20 12:15:00', 'https://meeting24.com', 'Accepted', 'Positive feedback on methodology; discussing implementation strategies.'),
+       (25, 8, '2023-05-25 15:00:00', '2023-05-25 17:00:00', 'https://meeting25.com', 'Requested', 'Pending decision; seeking approval for next steps.');
 
 INSERT INTO student
 VALUES ('PES2UG21CS001', 'John', 'Doe', 'CSE', 5, 'A', 'password1'),
@@ -210,5 +210,4 @@ VALUES ('DOI001', 1),
        ('DOI007', 4),
        ('DOI008', 5),
        ('DOI008', 6);
-
 
