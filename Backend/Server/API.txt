@@ -168,8 +168,8 @@ API:
         projectTitle : String,
         projectStatus : "Published" / "Ongoing",
         startDate : Date (YYYY-MM-DD),
-        endDate : Date (YYYY-MM-DD) / "",
-        facultyID : [ String ]
+        endDate : Date (YYYY-MM-DD),              {optional}
+        facultyID : [ String ],
         studentID : [ String ]
     }
 
@@ -229,7 +229,7 @@ API:
         projectTitle : String,
         projectStatus : "Published" / "Ongoing",
         endDate : Date (YYYY-MM-DD),
-        facultyID : [ String ]
+        facultyID : [ String ],
         studentID : [ String ]
     }
 

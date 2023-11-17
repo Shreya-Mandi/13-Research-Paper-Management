@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const Joi = require('joi');
+const Joi = require('joi').extend(require('@joi/date'));
 const mysql = require('mysql2/promise');
 
 const PORT = 3002;
@@ -34,7 +34,7 @@ async function StartService() {
 
         app.post('/GetProjects/', handleGetProjects);          // working - in-efficient
 
-        app.post('/NewProject/', handleTest);
+        app.post('/NewProject/', handleNewProject);            // working
         app.post('/GetProject/', handleGetProject);            // working - in-efficient
         app.post('/UpdProject/', handleTest);
         app.post('/DelProject/', handleDelProject);            // working
@@ -178,7 +178,7 @@ async function handleRegister(req, res) {
                      '${req.body.details.lastName}',
                      '${req.body.details.dept.toUpperCase()}',` + (
                 (req.body.type === "student") ?
-                    `${req.body.details.sem}, '${req.body.details.sec}',` :
+                    `${req.body.details.sem}, '${req.body.details.sec.toUpperCase()}',` :
                     `'${req.body.details.domain}',`
             ) + `'${req.body.pwd}')`;
 
@@ -284,6 +284,82 @@ async function handleGetProjects(req, res) {
         })
 
         let response = {status: true, projects: projectList};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleNewProject(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectTitle: Joi.string().required(),
+            projectStatus: Joi.string().valid("Published", "Ongoing").insensitive().required(),
+            startDate: Joi.date().format('YYYY-MM-DD').required(),
+            endDate: Joi.date().format('YYYY-MM-DD').min(Joi.ref('startDate')).optional(),
+            facultyID: Joi.array().min(1).items(Joi.string().alphanum().length(8)).required(),
+            studentID: Joi.array().min(1).items(Joi.string().alphanum().length(13)).required(),
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, valuesQuery, projectID, _, connection = await getConnection();
+
+        await connection.query(`START TRANSACTION`);
+
+        sqlQuery =
+            `INSERT INTO paper (topic, status, start_date, end_date)
+             VALUES ('${req.body.projectTitle}',
+                     '${req.body.projectStatus}',
+                     '${req.body.startDate}',` +
+            ((req.body.hasOwnProperty("endDate")) ? `'${req.body.endDate}'` : `NULL`) +
+            `)`;
+        await connection.query(sqlQuery);
+
+        [projectID, _] = await connection.query(`SELECT id
+                                                 FROM paper
+                                                 ORDER BY id DESC
+                                                 LIMIT 1`);
+        projectID = projectID[0].id;
+
+        valuesQuery = ``;
+        req.body.studentID.forEach((item, index) => {
+            if (index !== 0)
+                valuesQuery += `,`;
+            valuesQuery += `('${item}', '${projectID}')`;
+        });
+        sqlQuery = `INSERT INTO student_writes_paper
+                    VALUES ` + valuesQuery;
+        await connection.query(sqlQuery);
+
+        valuesQuery = ``;
+        req.body.facultyID.forEach((item, index) => {
+            if (index !== 0)
+                valuesQuery += `,`;
+            valuesQuery += `('${item}', '${projectID}')`;
+        });
+        sqlQuery = `INSERT INTO faculty_advises_paper (Faculty_ID, Paper_ID)
+                    VALUES ` + valuesQuery;
+        await connection.query(sqlQuery);
+
+        await connection.query(`COMMIT`);
+
+        let response = {status: true};
 
         console.log("Success, ", response);
         res.send(response);
@@ -485,7 +561,7 @@ async function handleTest(req, res) {
         // TODO validate request
         const schema = Joi.object({});
 
-        let check = schema.validate(req.body);
+        let check = schema.validate({});
         if (check.hasOwnProperty("error")) {
             let response = {
                 invalidRequest: true,
