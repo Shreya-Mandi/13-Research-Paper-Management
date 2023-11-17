@@ -36,7 +36,7 @@ async function StartService() {
 
         app.post('/NewProject/', handleNewProject);            // working
         app.post('/GetProject/', handleGetProject);            // working - in-efficient
-        app.post('/UpdProject/', handleTest);
+        app.post('/UpdProject/', handleUpdProject);            // working
         app.post('/DelProject/', handleDelProject);            // working
 
         app.post('/NewMeeting/', handleTest);
@@ -45,6 +45,8 @@ async function StartService() {
 
         app.post('/NewSuggestions/', handleTest);
         app.post('/GetSuggestions/', handleGetSuggestions);    // working
+
+        app.get('/GetUsers/', handleTest);
 
         console.log("Set up express.")
 
@@ -441,6 +443,103 @@ async function handleGetProject(req, res) {
     }
 }
 
+async function handleUpdProject(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required(),
+            projectTitle: Joi.string().optional(),
+            projectStatus: Joi.string().valid("Published", "Ongoing").insensitive().optional(),
+            startDate: Joi.date().format('YYYY-MM-DD').optional(),
+            endDate: Joi.date().format('YYYY-MM-DD').min(Joi.ref('startDate')).optional(),
+            facultyID: Joi.array().min(1).items(Joi.string().alphanum().length(8)).optional(),
+            studentID: Joi.array().min(1).items(Joi.string().alphanum().length(13)).optional(),
+            delEndDate: Joi.boolean().optional(),
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, valuesQuery, connection = await getConnection();
+
+        await connection.query(`START TRANSACTION`);
+
+        if (req.body.hasOwnProperty("projectTitle")) {
+            await connection.query(`UPDATE paper
+                                    SET topic = '${req.body.projectTitle}'
+                                    WHERE id = ${req.body.projectID}`);
+        }
+        if (req.body.hasOwnProperty("projectStatus")) {
+            await connection.query(`UPDATE paper
+                                    SET status = '${req.body.projectStatus}'
+                                    WHERE id = ${req.body.projectID}`);
+        }
+        if (req.body.hasOwnProperty("startDate")) {
+            await connection.query(`UPDATE paper
+                                    SET start_date = '${req.body.startDate}'
+                                    WHERE id = ${req.body.projectID}`);
+        }
+        if (req.body.hasOwnProperty("endDate")) {
+            await connection.query(`UPDATE paper
+                                    SET end_date = '${req.body.endDate}'
+                                    WHERE id = ${req.body.projectID}`);
+        }
+        if (req.body.hasOwnProperty("delEndDate") && req.body.delEndDate){
+            await connection.query(`UPDATE paper
+                                    SET end_date = NULL
+                                    WHERE id = ${req.body.projectID}`);
+        }
+        if (req.body.hasOwnProperty("studentID")) {
+            sqlQuery = `DELETE FROM student_writes_paper WHERE paper_id = ${req.body.projectID}`;
+            await connection.query(sqlQuery);
+
+            valuesQuery = ``;
+            req.body.studentID.forEach((item, index) => {
+                if (index !== 0)
+                    valuesQuery += `,`;
+                valuesQuery += `('${item}', '${req.body.projectID}')`;
+            });
+            sqlQuery = `INSERT INTO student_writes_paper
+                        VALUES ` + valuesQuery;
+            await connection.query(sqlQuery);
+        }
+        if (req.body.hasOwnProperty("facultyID")) {
+            sqlQuery = `DELETE FROM faculty_advises_paper WHERE paper_id = ${req.body.projectID}`;
+            await connection.query(sqlQuery);
+
+            valuesQuery = ``;
+            req.body.facultyID.forEach((item, index) => {
+                if (index !== 0)
+                    valuesQuery += `,`;
+                valuesQuery += `('${item}', '${req.body.projectID}')`;
+            });
+            sqlQuery = `INSERT INTO faculty_advises_paper (faculty_id, paper_id)
+                        VALUES ` + valuesQuery;
+            await connection.query(sqlQuery);
+        }
+
+        await connection.query(`COMMIT`);
+
+        let response = {status: true};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
 async function handleDelProject(req, res) {
     try {
         console.log("Got request", req.body);
@@ -540,7 +639,7 @@ async function handleGetSuggestions(req, res) {
             `SELECT t1.*, Concat(first_name, ' ', last_name) AS name
              FROM (SELECT faculty_id AS id, suggestions AS msg, timestamp AS time
                    FROM faculty_advises_paper
-                   WHERE paper_id = ${req.body.projectID}) AS t1
+                   WHERE paper_id = ${req.body.projectID} AND suggestions <> '') AS t1
                       NATURAL JOIN faculty`;
         [suggestionsList, _] = await connection.query(sqlQuery);
 

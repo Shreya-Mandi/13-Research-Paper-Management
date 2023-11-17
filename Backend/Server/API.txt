@@ -12,9 +12,9 @@ API:
 
 3. "http://localhost:3002/GetProjects/"       // working - in-efficient
 
-4. "http://localhost:3002/NewProject/"
+4. "http://localhost:3002/NewProject/"        // working
 5. "http://localhost:3002/GetProject/"        // working - in-efficient
-6. "http://localhost:3002/UpdProject/"
+6. "http://localhost:3002/UpdProject/"        // working
 7. "http://localhost:3002/DelProject/"        // working
 
 8. "http://localhost:3002/NewMeeting/"
@@ -24,6 +24,7 @@ API:
 11. "http://localhost:3002/NewSuggestion/"
 12. "http://localhost:3002/GetSuggestions/"   // working
 
+13. "http://localhost:3002/GetUsers/"
 
 0. "http://localhost:3002/NewDb/"
     method: GET
@@ -222,15 +223,17 @@ API:
 
     request:
     {
-        projectId : Int,
+        projectID : Int,
 
         (the following parameters are optional)
 
         projectTitle : String,
         projectStatus : "Published" / "Ongoing",
+        startDate : Date (YYYY-MM-DD),
         endDate : Date (YYYY-MM-DD),
         facultyID : [ String ],
-        studentID : [ String ]
+        studentID : [ String ],
+        delEndDate : true / false
     }
 
     response:
@@ -246,7 +249,7 @@ API:
 
     request:
     {
-        projectId : Int
+        projectID : Int
     }
 
     response:
