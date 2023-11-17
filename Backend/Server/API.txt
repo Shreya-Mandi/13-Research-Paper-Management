@@ -17,14 +17,15 @@ API:
 6. "http://localhost:3002/UpdProject/"        // working
 7. "http://localhost:3002/DelProject/"        // working
 
-8. "http://localhost:3002/NewMeeting/"
+8. "http://localhost:3002/NewMeeting/"        // working
 9. "http://localhost:3002/GetMeetings/"       // working
-10. "http://localhost:3002/UpdMeeting/"
+10. "http://localhost:3002/UpdMeeting/"       // working
 
-11. "http://localhost:3002/NewSuggestion/"
+11. "http://localhost:3002/NewSuggestion/"    // working
 12. "http://localhost:3002/GetSuggestions/"   // working
 
 13. "http://localhost:3002/GetUsers/"         // working
+
 
 0. "http://localhost:3002/NewDb/"
     method: GET

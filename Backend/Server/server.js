@@ -39,11 +39,11 @@ async function StartService() {
         app.post('/UpdProject/', handleUpdProject);            // working
         app.post('/DelProject/', handleDelProject);            // working
 
-        app.post('/NewMeeting/', handleTest);
+        app.post('/NewMeeting/', handleNewMeeting);            // working
         app.post('/GetMeetings/', handleGetMeetings);          // working
-        app.post('/UpdMeeting/', handleTest);
+        app.post('/UpdMeeting/', handleUpdMeeting);            // working
 
-        app.post('/NewSuggestions/', handleTest);
+        app.post('/NewSuggestion/', handleNewSuggestion);      // working
         app.post('/GetSuggestions/', handleGetSuggestions);    // working
 
         app.get('/GetUsers/', handleGetUsers);                      // working
@@ -393,9 +393,9 @@ async function handleGetProject(req, res) {
 
         let sqlQuery, projects, students, faculty, _, connection = await getConnection();
         sqlQuery =
-            `SELECT id         AS projectID,
-                    topic      AS projectTitle,
-                    status     AS projectStatus,
+            `SELECT id                                  AS projectID,
+                    topic                               AS projectTitle,
+                    status                              AS projectStatus,
                     Date_Format(start_date, '%Y-%m-%d') AS startDate,
                     Date_Format(end_date, '%Y-%m-%d')   AS endDate
              FROM paper
@@ -454,7 +454,7 @@ async function handleUpdProject(req, res) {
             projectTitle: Joi.string().optional(),
             projectStatus: Joi.string().valid("Published", "Ongoing").insensitive().optional(),
             startDate: Joi.date().format('YYYY-MM-DD').optional(),
-            endDate: Joi.date().format('YYYY-MM-DD').min(Joi.ref('startDate')).optional(),
+            endDate: Joi.date().format('YYYY-MM-DD').optional(),
             facultyID: Joi.array().min(1).items(Joi.string().alphanum().length(8)).optional(),
             studentID: Joi.array().min(1).items(Joi.string().alphanum().length(13)).optional(),
             delEndDate: Joi.boolean().optional(),
@@ -496,13 +496,15 @@ async function handleUpdProject(req, res) {
                                     SET end_date = '${req.body.endDate}'
                                     WHERE id = ${req.body.projectID}`);
         }
-        if (req.body.hasOwnProperty("delEndDate") && req.body.delEndDate){
+        if (req.body.hasOwnProperty("delEndDate") && req.body.delEndDate) {
             await connection.query(`UPDATE paper
                                     SET end_date = NULL
                                     WHERE id = ${req.body.projectID}`);
         }
         if (req.body.hasOwnProperty("studentID")) {
-            sqlQuery = `DELETE FROM student_writes_paper WHERE paper_id = ${req.body.projectID}`;
+            sqlQuery = `DELETE
+                        FROM student_writes_paper
+                        WHERE paper_id = ${req.body.projectID}`;
             await connection.query(sqlQuery);
 
             valuesQuery = ``;
@@ -516,7 +518,9 @@ async function handleUpdProject(req, res) {
             await connection.query(sqlQuery);
         }
         if (req.body.hasOwnProperty("facultyID")) {
-            sqlQuery = `DELETE FROM faculty_advises_paper WHERE paper_id = ${req.body.projectID}`;
+            sqlQuery = `DELETE
+                        FROM faculty_advises_paper
+                        WHERE paper_id = ${req.body.projectID}`;
             await connection.query(sqlQuery);
 
             valuesQuery = ``;
@@ -579,6 +583,51 @@ async function handleDelProject(req, res) {
     }
 }
 
+async function handleNewMeeting(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required(),
+            startTime: Joi.date().format('YYYY-MM-DD HH:mm:ss').required(),
+            endTime: Joi.date().format('YYYY-MM-DD HH:mm:ss').min(Joi.ref('startTime')).required(),
+            link: Joi.string().required(),
+            remarks: Joi.string().required(),
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, connection = await getConnection();
+
+        sqlQuery =
+            `INSERT INTO meeting(paper_id, start_time, end_time, link, remarks)
+             VALUES ('${req.body.projectID}',
+                     '${req.body.startTime}',
+                     '${req.body.endTime}',
+                     '${req.body.link}',
+                     '${req.body.remarks}')`;
+        await connection.query(sqlQuery);
+
+        let response = {status: true};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
 async function handleGetMeetings(req, res) {
     try {
         console.log("Got request", req.body);
@@ -601,12 +650,128 @@ async function handleGetMeetings(req, res) {
 
         let sqlQuery, meetingList, _, connection = await getConnection();
         sqlQuery =
-            `SELECT id, start_time AS startTime, end_time AS endTime, link, status, remarks
+            `SELECT id,
+                    DATE_FORMAT(start_time, '%Y-%m-%d %H-%i-%s') AS startTime,
+                    DATE_FORMAT(end_time, '%Y-%m-%d %H-%i-%s')   AS endTime,
+                    link,
+                    status,
+                    remarks
              FROM meeting
              WHERE paper_id = ${req.body.projectID}`;
         [meetingList, _] = await connection.query(sqlQuery);
 
         let response = {status: true, meetings: meetingList};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleUpdMeeting(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            meetingID: Joi.number().integer().min(0).required(),
+            status: Joi.string().valid('Accepted', 'Rejected', 'Requested').insensitive().optional(),
+            startTime: Joi.date().format('YYYY-MM-DD HH:mm:ss').optional(),
+            endTime: Joi.date().format('YYYY-MM-DD HH:mm:ss').optional(),
+            link: Joi.string().optional(),
+            remarks: Joi.string().optional(),
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let connection = await getConnection();
+
+        await connection.query(`START TRANSACTION`);
+
+        if (req.body.hasOwnProperty("status")) {
+            await connection.query(`UPDATE meeting
+                                    SET status = '${req.body.status}'
+                                    WHERE id = ${req.body.meetingID}`);
+        }
+        if (req.body.hasOwnProperty("startTime")) {
+            await connection.query(`UPDATE meeting
+                                    SET start_time = '${req.body.startTime}',
+                                        status     = 'Requested'
+                                    WHERE id = ${req.body.meetingID}`);
+        }
+        if (req.body.hasOwnProperty("endTime")) {
+            await connection.query(`UPDATE meeting
+                                    SET end_time = '${req.body.endTime}',
+                                        status   = 'Requested'
+                                    WHERE id = ${req.body.meetingID}`);
+        }
+        if (req.body.hasOwnProperty("link")) {
+            await connection.query(`UPDATE meeting
+                                    SET link = '${req.body.link}'
+                                    WHERE id = ${req.body.meetingID}`);
+        }
+        if (req.body.hasOwnProperty("remarks")) {
+            await connection.query(`UPDATE meeting
+                                    SET remarks = '${req.body.remarks}',
+                                        status  = 'Requested'
+                                    WHERE id = ${req.body.meetingID}`);
+        }
+
+        await connection.query(`COMMIT`);
+
+        let response = {status: true};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleNewSuggestion(req, res) {
+    try {
+        console.log("Got request", req.body);
+
+        const schema = Joi.object({
+            projectID: Joi.number().integer().min(0).required(),
+            facultyID: Joi.string().alphanum().length(8).required(),
+            suggestion: Joi.string().required()
+        });
+
+        let check = schema.validate(req.body);
+        if (check.hasOwnProperty("error")) {
+            let response = {
+                invalidRequest: true,
+                status: false,
+                errMsg: check.error.details[0].message
+            };
+            console.log("InvalidRequest, ", response);
+            res.send(response);
+            return;
+        }
+
+        let sqlQuery, connection = await getConnection();
+        sqlQuery =
+            `INSERT INTO faculty_advises_paper
+             VALUES ('${req.body.facultyID}',
+                     '${req.body.projectID}',
+                     '${req.body.suggestion}',
+                     Now())`;
+        await connection.query(sqlQuery);
+
+        let response = {status: true};
 
         console.log("Success, ", response);
         res.send(response);
@@ -639,9 +804,10 @@ async function handleGetSuggestions(req, res) {
         let sqlQuery, suggestionsList, _, connection = await getConnection();
         sqlQuery =
             `SELECT t1.*, Concat(first_name, ' ', last_name) AS name
-             FROM (SELECT faculty_id AS id, suggestions AS msg, timestamp AS time
+             FROM (SELECT faculty_id AS id, suggestions AS msg, DATE_FORMAT(timestamp, '%Y-%m-%d %H-%i-%s') AS time
                    FROM faculty_advises_paper
-                   WHERE paper_id = ${req.body.projectID} AND suggestions <> '') AS t1
+                   WHERE paper_id = ${req.body.projectID}
+                     AND suggestions <> '') AS t1
                       NATURAL JOIN faculty`;
         [suggestionsList, _] = await connection.query(sqlQuery);
 
@@ -660,11 +826,13 @@ async function handleGetUsers(req, res) {
         let sqlQuery, students, faculty, _, connection = await getConnection();
 
         sqlQuery =
-            `SELECT srn FROM student`;
+            `SELECT srn
+             FROM student`;
         [students, _] = await connection.query(sqlQuery);
 
         sqlQuery =
-            `SELECT id FROM faculty`;
+            `SELECT id
+             FROM faculty`;
         [faculty, _] = await connection.query(sqlQuery);
 
         let response = {status: true, facultyID: faculty, studentID: students};
