@@ -22,31 +22,69 @@ if st.session_state['type']=='faculty':
     st.session_state['details']['domain']= st.selectbox('Domain:',['DA','NLP','LLM','SYS','EEE','GT','others'])
 
 def check_constraints():
-    if st.session
+    # constraint checks
+    if st.session_state['type']=='student':
+        if len(st.session_state['id']) != 10:
+            st.write('Invalid name')
+            return False
+    else:
+        if len(st.session_state['id']) != 8:
+            st.write('Invalid name')
+            return False
+    if st.session_state['password']==st.session_state['password_re']:
+        return True
+    else:
+        st.write('Passwords entered do not match!')
+        return False
 
 def submit():
-    # API post call
-    response = requests.post("http://localhost:6969/Register/",
-                             json={
-                                 'id': st.session_state['id'],
-                                 'pwd': st.session_state['password'],
-                                 'type': st.session_state['type'],
-                                 'details': st.session_state['details']
-                             })
+    if(check_constraints()):
+        print('Sending register request')
+        # API post call
+        response = requests.post("http://localhost:6969/Register/",
+                                 json={
+                                     'id': st.session_state['id'],
+                                     'pwd': st.session_state['password'],
+                                     'type': st.session_state['type'],
+                                     'details': st.session_state['details']
+                                 })
 
-    res_json = response.json()
+        res_json = response.json()
+        if(res_json):
+            print('register res_json received')
+        return res_json
+    else:
+        print('Register passwords did not match')
 
 def check_res(res_json):
     if res_json['status'] == True:
-        if st.session_state['password'] == st.session_state['password_re']:
-            st.write('Successful register')
+        st.write('Successful register')
+    else:
+        if res_json['invalidRequest']==True:
+            print('Register module incorrect request made')
+        else:
+            print('Register module- internal server error')
+            print(res_json['errMsg'])
 
-    print(res_json)
-link = 'http://localhost:8501'
 
+# register button
+if st.button('Register'):
+    res_json=submit()
+    if res_json:
+     check_res(res_json)
+
+# login button
+st.write('Already have an account?')
 if st.button('Login'):
-    webbrowser.open_new_tab(link)
+    st.write('redirect to login')
+    # webbrowser.open_new_tab("http://localhost:3002/Register/")
+
+# View as guest
+st.write('Not a member?')
+if st.button('Login as guest'):
+    st.write('Redirect to guest view')
+    # webbrowser.open_new_tab("http://localhost:3002/Register/")
 
 '''
-### Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
+Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
 '''
