@@ -24,7 +24,7 @@ API:
 11. "http://localhost:3002/NewSuggestion/"
 12. "http://localhost:3002/GetSuggestions/"   // working
 
-13. "http://localhost:3002/GetUsers/"
+13. "http://localhost:3002/GetUsers/"         // working
 
 0. "http://localhost:3002/NewDb/"
     method: GET
@@ -373,3 +373,15 @@ API:
                       ]
     }
 
+
+13. "http://localhost:3002/GetUsers/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+
+        facultyID : [ String ],
+        studentID : [ String ]
+    }

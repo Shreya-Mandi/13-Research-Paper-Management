@@ -46,7 +46,7 @@ async function StartService() {
         app.post('/NewSuggestions/', handleTest);
         app.post('/GetSuggestions/', handleGetSuggestions);    // working
 
-        app.get('/GetUsers/', handleTest);
+        app.get('/GetUsers/', handleGetUsers);                      // working
 
         console.log("Set up express.")
 
@@ -396,11 +396,13 @@ async function handleGetProject(req, res) {
             `SELECT id         AS projectID,
                     topic      AS projectTitle,
                     status     AS projectStatus,
-                    start_date AS startDate,
-                    end_date   AS endDate
+                    Date_Format(start_date, '%Y-%m-%d') AS startDate,
+                    Date_Format(end_date, '%Y-%m-%d')   AS endDate
              FROM paper
              WHERE id = ${req.body.projectID}`;
         [projects, _] = await connection.query(sqlQuery);
+
+        console.log(projects);
 
         projects.forEach((item) => {
             item.faculty = [];
@@ -650,6 +652,28 @@ async function handleGetSuggestions(req, res) {
     } catch (err) {
         console.log(err, '- Error !!!!!!!!!!!!!!!!');
         res.send({invalidRequest: false, status: false, errMsg: err});
+    }
+}
+
+async function handleGetUsers(req, res) {
+    try {
+        let sqlQuery, students, faculty, _, connection = await getConnection();
+
+        sqlQuery =
+            `SELECT srn FROM student`;
+        [students, _] = await connection.query(sqlQuery);
+
+        sqlQuery =
+            `SELECT id FROM faculty`;
+        [faculty, _] = await connection.query(sqlQuery);
+
+        let response = {status: true, facultyID: faculty, studentID: students};
+
+        console.log("Success, ", response);
+        res.send(response);
+    } catch (err) {
+        console.log(err, '- Error !!!!!!!!!!!!!!!!');
+        res.send({status: false, errMsg: err});
     }
 }
 
