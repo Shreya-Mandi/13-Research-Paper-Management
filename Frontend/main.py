@@ -43,10 +43,13 @@ def run_choice():
             ch = landing_obj.login_or_register()
             landing_obj.display_auth_module(ch)
 
-    elif choose_menu == 'Your Projects':
+    if choose_menu == 'Your Projects':
         print('your projects')
         projects_obj = projects.GetProjects(landing_obj.id, landing_obj.type)
         projects_obj.put_streamlit_projects()
+
+    if choose_menu=='Your Meetings':
+        print('your meetings')
 
 
 choose_menu = None
@@ -68,4 +71,8 @@ if st.sidebar.button('Home'):
 
 if st.sidebar.button('Your Projects'):
     choose_menu='Your Projects'
+    run_choice()
+
+if st.sidebar.button('Your Meetings'):
+    choose_menu='Your Meetings'
     run_choice()
