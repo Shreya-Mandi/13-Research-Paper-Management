@@ -5,6 +5,13 @@ import pandas as pd
 # Research Paper Management System
 '''
 
+if st.button('Create new project'):
+    st.write('redirect to new project')
+if st.button('Update project'):
+    st.write('redirect to update page')
+if st.button('Delete project'):
+    st.write('redirect to delete a project')
+
 def get_projects():
     response=requests.post("http://localhost:3002/GetProjects/",
                            json=dict(usrName=st.session_state['id'], type=st.session_state['type']))
@@ -36,12 +43,3 @@ if check_res():
 '''
 ### Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
 '''
-
-# def reload_stuff():
-#     check=0
-#     b=st.button('Reload')
-#     if (b) or check==0:
-#         check=1
-#         st.cache_resource.clear()
-#         res_json = response.json()
-#         print(res_json)
