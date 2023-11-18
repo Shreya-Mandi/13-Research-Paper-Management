@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-import webbrowser
+import json
 
 
 class NewProject():
@@ -67,7 +67,6 @@ class NewProject():
                 print(res_json['errMsg'])
 
     def put_streamlit_newProject(self):
-
         '''
                 ## Create Project
                 ## Project Details
@@ -79,22 +78,6 @@ class NewProject():
             res_json=self.submit()
             if res_json:
                 self.check_res(res_json)
-#
-# # login button
-# st.write('Go back to prjects')
-# if st.button('Projects'):
-#     st.write('redirect to getProjects')
-#     # webbrowser.open_new_tab("http://localhost:3002/Register/")
-#
-#
-# # View as guest
-# st.write('Back to homepage?')
-# if st.button('Homepage'):
-#     st.write('Redirect to landing page')
-#     # webbrowser.open_new_tab("http://localhost:3002/Register/")
-
-
-
 
 
 

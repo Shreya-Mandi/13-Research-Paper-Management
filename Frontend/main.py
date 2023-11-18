@@ -2,7 +2,7 @@ import login
 import register
 import projects
 import streamlit as st
-
+import json
 
 class Landing:
     def __init__(self):
@@ -11,6 +11,7 @@ class Landing:
         self.type = None
         st.session_state['id'] = None
         st.session_state['pwd'] = None
+        st.session_state['type'] = None
 
     def is_logged_in(self):
         if self.id != None and self.pwd != None:
@@ -20,16 +21,13 @@ class Landing:
 
     def login_or_register(self):
         choice = st.selectbox('Welocome, login, register or use as guest:', ['login', 'register', 'guest'])
-        print(choice)
         return choice
+
 
     def display_auth_module(self, choice):
         if choice == 'login':
             login_obj = login.Login()
             login_obj.put_streamlit_login()
-            if login_obj.save_login():
-                self.id, self.pwd, self.type = login_obj.save_login()
-            print(self.id, self.pwd, self.type)
 
         if choice == 'register':
             register_obj = register.Register()
@@ -44,13 +42,12 @@ def run_choice():
             landing_obj.display_auth_module(ch)
 
     elif choose_menu == 'Your Projects':
-        print('your projects')
-        print(landing_obj.id,landing_obj.pwd,landing_obj.type)
+
         projects_obj = projects.GetProjects(landing_obj.id, landing_obj.type)
         projects_obj.put_streamlit_projects()
 
-    elif choose_menu=='Your Meetings':
-        print('your meetings')
+    # elif choose_menu=='Your Meetings':
+    #     print('your meetings')
 
 
 choose_menu = None
