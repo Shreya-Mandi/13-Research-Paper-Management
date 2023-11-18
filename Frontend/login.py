@@ -5,9 +5,17 @@ import json
 
 class Login:
     def __init__(self):
-        self.id=st.session_state['id']
-        self.pwd=st.session_state['pwd']
-        self.type=st.session_state['type']
+        # self.id = None
+        # self.pwd = None
+        # self.type = None
+
+        if 'id' not in st.session_state:
+            self.id = st.session_state['id'] = None
+        if 'pwd' not in st.session_state:
+            self.pwd = st.session_state['pwd'] = None
+        if 'type' not in st.session_state:
+            self.type = st.session_state['type'] = None
+
     def check_constraints(self):
         # constraint checks
         if len(st.session_state['id']) != 13:
@@ -29,9 +37,9 @@ class Login:
 
 
             res_json = response.json()
-            self.id = st.session_state['id']
-            self.pwd = st.session_state['pwd']
-            self.type = res_json['type']
+
+            st.session_state['type'] = res_json['type']
+
             print('now save login')
             self.save_login()
 
@@ -39,8 +47,7 @@ class Login:
 
     def check_res(self,res_json):
         if res_json['status'] == True:
-            # st.session_state['type'] = res_json['type']
-            # self.type=st.session_state['type']=res_json['type']
+
             st.write('Successful login')
 
         else:
@@ -58,7 +65,7 @@ class Login:
             my_login={
                 'id':st.session_state['id'],
                 'pwd':st.session_state['pwd'],
-                'type':self.type
+                'type':st.session_state['type']
             }
             json.dump(my_login,file)
         return(self.id,self.pwd,self.type)

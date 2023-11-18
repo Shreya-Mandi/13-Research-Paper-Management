@@ -6,21 +6,28 @@ import json
 
 class Landing:
     def __init__(self):
-        self.id = None
-        self.pwd = None
-        self.type = None
-        st.session_state['id'] = None
-        st.session_state['pwd'] = None
-        st.session_state['type'] = None
+        # self.id = None
+        # self.pwd = None
+        # self.type = None
+        if 'id' not in st.session_state:
+            self.id=st.session_state['id']=None
+        if 'pwd' not in st.session_state:
+            self.pwd=st.session_state['pwd']=None
+        if 'type' not in st.session_state:
+            self.type=st.session_state['type']=None
+        if 'where' not in st.session_state:
+            st.session_state['where']=None
+        if 'menu' not in st.session_state:
+            st.session_state['menu'] = None
 
     def is_logged_in(self):
-        if self.id != None and self.pwd != None:
+        if st.session_state['id'] != None and st.session_state['pwd'] != None:
             return 1
         else:
             return 0
 
     def login_or_register(self):
-        choice = st.selectbox('Welocome, login, register or use as guest:', ['login', 'register', 'guest'])
+        choice = st.selectbox('Welcome- login, register or use as guest:', ['login', 'register', 'guest'])
         return choice
 
 
@@ -36,44 +43,43 @@ class Landing:
         #     # login as guest
 
 def run_choice():
-    if choose_menu == 'Home':
+    if st.session_state['where']== 'Home':
         if (not landing_obj.is_logged_in()):
             ch = landing_obj.login_or_register()
             landing_obj.display_auth_module(ch)
 
-    elif choose_menu == 'Your Projects':
+    elif st.session_state['where']== 'Your Projects':
 
-        projects_obj = projects.GetProjects(landing_obj.id, landing_obj.type)
+        projects_obj = projects.GetProjects(st.session_state['id'], st.session_state['type'])
         projects_obj.put_streamlit_projects()
 
-    # elif choose_menu=='Your Meetings':
+    # elif st.session_state['where']=='Your Meetings':
     #     print('your meetings')
 
-
-choose_menu = None
 
 # main frame
 '''
 # Research Paper Management System
 '''
 landing_obj = Landing()
-if choose_menu == None:
+if st.session_state['where']== None:
     if (not landing_obj.is_logged_in()):
         ch = landing_obj.login_or_register()
         landing_obj.display_auth_module(ch)
+
 '''
 Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
 '''
 
 # sidebar
 if st.sidebar.button('Home'):
-    choose_menu='Home'
+    st.session_state['where'] = 'Home'
     run_choice()
 
 if st.sidebar.button('Your Projects'):
-    choose_menu='Your Projects'
+    st.session_state['where'] = 'Your Projects'
     run_choice()
 
 if st.sidebar.button('Your Meetings'):
-    choose_menu='Your Meetings'
+    st.session_state['where'] = 'Your Meetings'
     run_choice()
