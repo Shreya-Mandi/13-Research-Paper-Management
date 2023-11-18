@@ -31,7 +31,33 @@ def submit_register(id, pwd,type,details):
                                      'type': type,
                                      'details': details
                                  })
-
+        json = {
+            'id': id,
+            'pwd': pwd,
+            'type': type,
+            'details': details
+        }
+        print(json)
+        print('response received for register')
+        res_json = response.json()
+        print(res_json)
+        status, res_error = check_res_register(res_json)
+        return status, res_error, res_json
+    else:
+        return False, validation_error, {}
+def submit_register(id, pwd,type,details):
+    passed, validation_error = validator.validate_register(id, pwd,type,details)
+    if passed:
+        print('sending register post request')
+        response = requests.post("http://localhost:3002/GetProjects/",
+                               json={'id':st.session_state['id'], 'type':st.session_state['type']})
+        json = {
+            'id': id,
+            'pwd': pwd,
+            'type': type,
+            'details': details
+        }
+        print(json)
         print('response received for register')
         res_json = response.json()
         print(res_json)
@@ -52,11 +78,17 @@ def check_res_login(res_json):
         return False, 'Internal Error'
 
 def check_res_register(res_json):
-    if res_json['status']:
-        if res_json['valid']:
+        if res_json['status']:
             return True, ''
         else:
-            return False, 'All fields are required and password retyped must match'
+            print(res_json['errMsg'])
+            if "Duplicate" in res_json['errMsg']['message']:
+                return False, 'ID Already exists'
+            return False, 'Internal Error'
+
+def check_res_default(res_json):
+    if res_json['status']:
+        return True, ''
     else:
         print(res_json['errMsg'])
         return False, 'Internal Error'

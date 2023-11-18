@@ -4,3 +4,4 @@ def validate_login(user_id, user_password):
     return True, ''
 
 def validate_register(id, pwd,type,details):
+    return True, ''

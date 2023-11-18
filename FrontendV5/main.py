@@ -28,7 +28,7 @@ def register():
         with st.form('register_form'):
             details = dict()
             id = st.text_input('ID:')
-            details['firsName'] = st.text_input('First Name')
+            details['firstName'] = st.text_input('First Name')
             details['lastName'] = st.text_input('Last Name')
             password = st.text_input('Password')
             password_re = st.text_input('Re-enter Password')
@@ -41,12 +41,33 @@ def register():
             if type == 'faculty':
                 details['domain'] = st.selectbox('Domain:',['DA', 'NLP', 'LLM', 'SYS', 'EEE', 'GT', 'others'])
 
-        if st.form_submit_button('Register'):
-                status, error, data = helper.submit_login(id, password, type, details)
+            if st.form_submit_button('Register'):
+                    status, error, data = helper.submit_register(id, password, type, details)
+                    if status:
+                        ph.empty()
+                        dashboard2(id,type)
+                    else:
+                        print(data)
+                        st.write(error)
+
+def dashboard2(id,type):
+    with ph.container():
+        st.write("Welcome, successfully registered user")
+
+def getProjects():
+    with ph.container():
+        with st.form('getProjects'):
+
+            if st.form_submit_button('View Existing Projects'):
+                status, error, data = helper.submit_getProjects(id, password, type, details)
                 if status:
                     ph.empty()
-                    dashboard(user_id, data['type'], data['name'])
+                    dashboard3(id, type)
                 else:
+                    print(data)
                     st.write(error)
-
-login()
+def dashboard3(id,type):
+    with ph.container():
+        st.write("Welcome, successfully registered user")
+# login()
+# register()
