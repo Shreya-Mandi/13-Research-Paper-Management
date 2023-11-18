@@ -1,26 +1,38 @@
 import streamlit as st
-import requests
 import helper
 
-placeholder_login=st.empty()
-with placeholder_login.container():
-    with st.form('login_form'):
-        # Streamlit input
-        st.session_state['id'] = st.text_input('ID:')
-        st.session_state['pwd'] = st.text_input('Password:')
+ph = st.empty()
 
-        # login button
-        if st.form_submit_button('Login'):
-            res_json = helper.submit_login()
-            if res_json:
-               helper.check_res_login(res_json)
-            placeholder_login.empty()
-    for i,v in st.session_state.items():
-        print(i,v)
-#
-#     bt=st.button('Clear')
-#
-# if bt:
-#     for i, v in st.session_state.items():
-#         print(i, v)
-#     placeholder_login.empty()
+
+def login():
+    with ph.container():
+        st.title('Login')
+
+        with st.form('login_form'):
+            user_id = st.text_input('ID:')
+            user_pwd = st.text_input('Password:')
+
+            if st.form_submit_button('Login'):
+                status, error, data = helper.submit_login(user_id, user_pwd)
+                if status:
+                    ph.empty()
+                    dashboard(user_id, data['type'], data['name'])
+                else:
+                    st.write(error)
+
+        if st.button('Register'):
+            ph.empty()
+            register()
+
+
+def register():
+    pass
+
+
+def dashboard(user_id, user_type, user_name):
+    with ph.container():
+        st.title('Dashboard')
+        st.write('Welcome,', user_name)
+
+
+login()
