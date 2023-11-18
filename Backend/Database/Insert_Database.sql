@@ -72,7 +72,7 @@ VALUES
        (25, 8, '2023-05-25 15:00:00', '2023-05-25 17:00:00', 'https://meeting25.com', 'Requested', 'Pending decision; seeking approval for next steps.');
 
 INSERT INTO student
-VALUES ('PES2UG21CS001', 'John', 'Doe', 'CSE', 5, 'A', 'password1'),
+VALUES ('PES2UG21CS001', 'John', 'Doe', 'CSE', 5, 'A', 'pesu@123'),
        ('PES2UG21CS002', 'Jane', 'Smith', 'CSE', 5, 'B', 'password2'),
        ('PES2UG21CS003', 'Bob', 'Johnson', 'ECE', 4, 'C', 'password3'),
        ('PES2UG21CS004', 'Alice', 'Williams', 'AIML', 6, 'A', 'password4'),
@@ -87,6 +87,7 @@ VALUES ('PES2UG21CS001', 'John', 'Doe', 'CSE', 5, 'A', 'password1'),
 INSERT INTO student_writes_paper
 VALUES ('PES2UG21CS001', 1),
        ('PES2UG21CS001', 2),
+       ('PES2UG21CS001', 4),
        ('PES2UG21CS002', 2),
        ('PES2UG21CS002', 3),
        ('PES2UG21CS003', 3),
@@ -107,7 +108,7 @@ VALUES ('PES2UG21CS001', 1),
 
 
 INSERT INTO faculty
-VALUES ('PESCS001', 'Dr. Michael', 'Johnson', 'CSE', 'Machine Learning', 'faculty_password1'),
+VALUES ('PESCS001', 'Dr. Michael', 'Johnson', 'CSE', 'Machine Learning', 'pesadm@123'),
        ('PESCS002', 'Prof. Sarah', 'Smith', 'ECE', 'Signal Processing', 'faculty_password2'),
        ('PESCS003', 'Dr. Robert', 'Brown', 'AIML', 'Natural Language Processing', 'faculty_password3'),
        ('PESCS004', 'Prof. Emily', 'Jones', 'ME', 'Thermal Engineering', 'faculty_password4'),
@@ -121,6 +122,7 @@ VALUES ('PESCS001', 'Dr. Michael', 'Johnson', 'CSE', 'Machine Learning', 'facult
 
 INSERT INTO faculty_advises_paper
 VALUES ('PESCS001', 1, 'Excellent work', '2023-02-05 15:00:00'),
+       ('PESCS001', 4, '', '2023-02-05 15:00:00'),
        ('PESCS002', 2, 'Consider blockchain', '2023-05-11 15:34:23'),
        ('PESCS003', 3, 'Impressive research', '2023-03-20 10:45:00'),
        ('PESCS004', 4, 'Well-documented findings', '2023-06-01 14:15:30'),
