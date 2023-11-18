@@ -24,7 +24,7 @@ class Register:
     def check_constraints(self):
         # constraint checks
         if st.session_state['type']=='student':
-            if len(st.session_state['id']) != 10:
+            if len(st.session_state['id']) != 13:
                 st.write('Invalid name')
                 return False
         else:
@@ -41,7 +41,7 @@ class Register:
         if(self.check_constraints()):
             print('Sending register request')
             # API post call
-            response = requests.post("http://localhost:6969/Register/",
+            response = requests.post("http://localhost:3002/Register/",
                                      json={
                                          'id': st.session_state['id'],
                                          'pwd': st.session_state['password'],
@@ -67,6 +67,14 @@ class Register:
         else:
             if res_json['invalidRequest']==True:
                 print('Register module incorrect request made')
+                json = {
+                    'id': st.session_state['id'],
+                    'pwd': st.session_state['password'],
+                    'type': st.session_state['type'],
+                    'details': st.session_state['details']
+                }
+                print(json)
+                print(res_json['errMsg'])
             else:
                 print('Register module- internal server error')
                 print(res_json['errMsg'])
@@ -79,19 +87,3 @@ class Register:
             res_json=self.submit()
             if res_json:
              self.check_res(res_json)
-
-# # login button
-# st.write('Already have an account?')
-# if st.button('Login'):
-#     st.write('redirect to login')
-#     # webbrowser.open_new_tab("http://localhost:3002/Register/")
-#
-# # View as guest
-# st.write('Not a member?')
-# if st.button('Login as guest'):
-#     st.write('Redirect to guest view')
-#     # webbrowser.open_new_tab("http://localhost:3002/Register/")
-
-'''
-Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
-'''

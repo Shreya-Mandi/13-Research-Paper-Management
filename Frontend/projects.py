@@ -16,7 +16,7 @@ class GetProjects:
 
     def get_projects(self):
         response=requests.post("http://localhost:3002/GetProjects/",
-                               json=dict(usrName=self.id, type=self.type))
+                               json={'id':self.id, 'type':self.type})
         res_json = response.json()
         return res_json
 
@@ -42,8 +42,8 @@ class GetProjects:
         if ch==self.menu_list[0]:
             # existing view
             res_json=self.get_projects()
-            if self.check_res():
-                self.display_projects()
+            if self.check_res(res_json):
+                self.display_projects(res_json)
         elif ch==self.menu_list[1]:
             # new project
             newProject_obj=newProject.NewProject(self.id)

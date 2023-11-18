@@ -38,17 +38,18 @@ class Landing:
         #     # login as guest
 
 def run_choice():
-    if choose_menu == None or choose_menu == 'Home':
+    if choose_menu == 'Home':
         if (not landing_obj.is_logged_in()):
             ch = landing_obj.login_or_register()
             landing_obj.display_auth_module(ch)
 
-    if choose_menu == 'Your Projects':
+    elif choose_menu == 'Your Projects':
         print('your projects')
+        print(landing_obj.id,landing_obj.pwd,landing_obj.type)
         projects_obj = projects.GetProjects(landing_obj.id, landing_obj.type)
         projects_obj.put_streamlit_projects()
 
-    if choose_menu=='Your Meetings':
+    elif choose_menu=='Your Meetings':
         print('your meetings')
 
 
@@ -59,7 +60,10 @@ choose_menu = None
 # Research Paper Management System
 '''
 landing_obj = Landing()
-
+if choose_menu == None:
+    if (not landing_obj.is_logged_in()):
+        ch = landing_obj.login_or_register()
+        landing_obj.display_auth_module(ch)
 '''
 Brought to you by: Suhas K, Srinivaasan N S, Soham Sarkar & Shreya Mandi
 '''

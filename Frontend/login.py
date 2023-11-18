@@ -10,7 +10,7 @@ class Login:
         self.type=None
     def check_constraints(self):
         # constraint checks
-        if len(st.session_state['id']) != 10:
+        if len(st.session_state['id']) != 13:
             st.write('Invalid name')
             return False
         return True
@@ -25,7 +25,7 @@ class Login:
                                          'pwd': st.session_state['pwd']
                                      })
 
-            print('response received for login post')
+            print('Response received for login')
             self.id = st.session_state['id']
             self.pwd = st.session_state['pwd']
 
@@ -39,11 +39,9 @@ class Login:
             self.type=res_json['type']
             st.write('Successful login')
 
-            # if st.button('My projects'):
-            #     webbrowser.open_new_tab(" http://localhost:8501")
         else:
             if res_json['invalidRequest'] == True:
-                print('Login equest is invalid')
+                print('Login request is invalid')
             else:
                 print('Internal server error on login')
                 print(res_json['errMsg'])
@@ -68,14 +66,5 @@ class Login:
             if res_json:
                 self.check_res(res_json)
 
-        # # register button
-        # st.write('Do not have an account?')
-        # if st.button('Register'):
-        #     webbrowser.open_new_tab("http://localhost:3002/Register/")
-        #
-        # # View as guest
-        # st.write('Not a member?')
-        # if st.button('Login as guest'):
-        #     st.write('Redirect to guest view')
 
 
