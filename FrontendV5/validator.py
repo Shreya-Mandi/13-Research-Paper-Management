@@ -5,3 +5,6 @@ def validate_login(user_id, user_password):
 
 def validate_register(id, pwd,type,details):
     return True, ''
+
+def validate_getProjects(id,type):
+    return True, ''

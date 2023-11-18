@@ -1,5 +1,6 @@
 import streamlit as st
 import helper
+import pandas as pd
 
 ph = st.empty()
 
@@ -54,20 +55,34 @@ def dashboard2(id,type):
     with ph.container():
         st.write("Welcome, successfully registered user")
 
-def getProjects():
+def getProjects(id,type):
     with ph.container():
         with st.form('getProjects'):
 
             if st.form_submit_button('View Existing Projects'):
-                status, error, data = helper.submit_getProjects(id, password, type, details)
+                status, error, data = helper.submit_getProjects(id, type)
                 if status:
                     ph.empty()
-                    dashboard3(id, type)
+                    dashboard3(data)
                 else:
-                    print(data)
                     st.write(error)
-def dashboard3(id,type):
+def dashboard3(data):
     with ph.container():
-        st.write("Welcome, successfully registered user")
+        if (data['projects'] == []):
+            st.write('no existing projects')
+        else:
+
+            df = pd.DataFrame(data=data['projects'], columns=data['projects'][0].keys())
+            df2 = df[['projectID',
+                        'projectTitle',
+                        'projectStatus'
+                        ]]
+            df3=pd.DataFrame()
+            df3['faculty'] = df.apply(lambda x: ' '.join(x), axis=1)
+            df3['student'] = df.apply(lambda x: ' '.join(x), axis=1)
+            st.dataframe(df)
+
 # login()
 # register()
+getProjects('PES2UG21CS001','student')
+

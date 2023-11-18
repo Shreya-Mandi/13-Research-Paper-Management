@@ -45,23 +45,17 @@ def submit_register(id, pwd,type,details):
         return status, res_error, res_json
     else:
         return False, validation_error, {}
-def submit_register(id, pwd,type,details):
-    passed, validation_error = validator.validate_register(id, pwd,type,details)
+def submit_getProjects(user_id,user_type):
+    passed, validation_error = validator.validate_getProjects(id,type)
     if passed:
-        print('sending register post request')
+        print('sending get projects post request')
         response = requests.post("http://localhost:3002/GetProjects/",
-                               json={'id':st.session_state['id'], 'type':st.session_state['type']})
-        json = {
-            'id': id,
-            'pwd': pwd,
-            'type': type,
-            'details': details
-        }
-        print(json)
-        print('response received for register')
+                               json={'id':user_id, 'type':user_type})
+
+        print('response get projects for register')
         res_json = response.json()
         print(res_json)
-        status, res_error = check_res_register(res_json)
+        status, res_error = check_res_default(res_json)
         return status, res_error, res_json
     else:
         return False, validation_error, {}
