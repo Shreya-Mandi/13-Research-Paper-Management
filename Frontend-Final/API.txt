@@ -1,0 +1,388 @@
+API:
+
+-1. "http://localhost:3002/Test/"             // working
+
+0. "http://localhost:3002/NewDb/"
+0. "http://localhost:3002/InsDb/"
+0. "http://localhost:3002/ClsDb/"
+0. "http://localhost:3002/DelDb/"
+
+1. "http://localhost:3002/Login/"             // working
+2. "http://localhost:3002/Register/"          // working
+
+3. "http://localhost:3002/GetProjects/"       // working - in-efficient
+
+4. "http://localhost:3002/NewProject/"        // working
+5. "http://localhost:3002/GetProject/"        // working - in-efficient
+6. "http://localhost:3002/UpdProject/"        // working
+7. "http://localhost:3002/DelProject/"        // working
+
+8. "http://localhost:3002/NewMeeting/"        // working
+9. "http://localhost:3002/GetMeetings/"       // working
+10. "http://localhost:3002/UpdMeeting/"       // working
+
+11. "http://localhost:3002/NewSuggestion/"    // working
+12. "http://localhost:3002/GetSuggestions/"   // working
+
+13. "http://localhost:3002/GetUsers/"         // working
+
+
+0. "http://localhost:3002/NewDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+0. "http://localhost:3002/InsDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+0. "http://localhost:3002/ClsDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+0. "http://localhost:3002/DelDb/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+    }
+
+
+1. "http://localhost:3002/Login/"
+    method: POST
+
+    request:
+    {
+        id : String,
+        pwd : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        valid : true / false,
+        type : "student" / "faculty",
+        name : String
+    }
+
+
+2. "http://localhost:3002/Register/"
+    method: POST
+
+    request:
+    {
+        id : String,
+        pwd : String,
+        type : "student" / "faculty",
+
+        (if type == "student")
+        details: {
+                     firstName : String,
+                     lastName : String,
+                     dept : "CSE" / "ECE" / "EEE" / "AIML" / "ME",
+                     sem : Int,
+                     sec : Char
+                 }
+
+        (if type == "faculty")
+        details: {
+                     firstName : String,
+                     lastName : String,
+                     dept : "CSE" / "ECE" / "EEE" / "AIML" / "ME"
+                     domain : String
+                 }
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+3. "http://localhost:3002/GetProjects/"
+    method: POST
+
+    request:
+    {
+        type : "student" / "faculty" / "guest",
+
+        (if type == "guest", dont put id)
+        id : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        projects : [
+                       {
+                           projectID : String,
+                           projectTitle : String,
+                           projectStatus : "Published" / "Ongoing",
+                           faculty : [
+                                         {
+                                             id : String,
+                                             name : String
+                                         }, ...
+                                     ]
+                           student : [
+                                         {
+                                             id : String,
+                                             name : String
+                                         }, ...
+                                     ]
+                       }, ...
+                   ]
+    }
+
+
+4. "http://localhost:3002/NewProject/"
+    method: POST
+
+    request:
+    {
+        projectTitle : String,
+        projectStatus : "Published" / "Ongoing",
+        startDate : Date (YYYY-MM-DD),
+        endDate : Date (YYYY-MM-DD),              {optional}
+        facultyID : [ String ],
+        studentID : [ String ]
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+5. "http://localhost:3002/GetProject/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        details : {
+                      projectID : Int
+                      projectTitle : String,
+                      projectStatus : "Published" / "Ongoing",
+                      startDate : Date (YYYY-MM-DD),
+                      endDate : Date (YYYY-MM-DD) / "",
+                      faculty : [
+                                    {
+                                        id : String,
+                                        name : String,
+                                    }, ...
+                                ]
+                      student : [
+                                    {
+                                        id : String,
+                                        name : String
+                                    }, ...
+                                ],
+                  }
+    }
+
+
+6. "http://localhost:3002/UpdProject/"
+    method: POST
+
+    request:
+    {
+        projectID : Int,
+
+        (the following parameters are optional)
+
+        projectTitle : String,
+        projectStatus : "Published" / "Ongoing",
+        startDate : Date (YYYY-MM-DD),
+        endDate : Date (YYYY-MM-DD),
+        facultyID : [ String ],
+        studentID : [ String ],
+        delEndDate : true / false
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+7. "http://localhost:3002/DelProject/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+8. "http://localhost:3002/NewMeeting/"
+    method: POST
+
+    request:
+    {
+        projectID : Int,
+        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        link : String,
+        remarks : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+9. "http://localhost:3002/GetMeetings/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        meetings : [
+                       {
+                        id : Int,
+                        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+                        link : String,
+                        status : "Accepted", "Rejected", "Requested",
+                        remarks : String
+                       }, ...
+                   ]
+    }
+
+
+10. "http://localhost:3002/UpdMeeting/"
+    method: POST
+
+    request:
+    {
+        meetingID : Int,
+
+        (the following parameters are optional)
+
+        status : "Accepted" / "Rejected" / "Requested",
+        startTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        endTime : Timestamp (YYYY-MM-DD hh:mm:ss),
+        link : String,
+        remarks : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+11. "http://localhost:3002/NewSuggestion/"
+    method: POST
+
+    request:
+    {
+        projectID : Int,
+        facultyID : String,
+        suggestion : String
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String
+    }
+
+
+12. "http://localhost:3002/GetSuggestions/"
+    method: POST
+
+    request:
+    {
+        projectID : Int
+    }
+
+    response:
+    {
+        invalidRequest : true / false,
+        status : true / false,
+        errMsg : String,
+
+        suggestions : [
+                          {
+                              id : String,
+                              name : String,
+                              msg : String,
+                              time : Timestamp (YYYY-MM-DD hh:mm:ss)
+                          }, ...
+                      ]
+    }
+
+
+13. "http://localhost:3002/GetUsers/"
+    method: GET
+
+    response:
+    {
+        status : true / false,
+        errMsg : String
+
+        facultyID : [ String ],
+        studentID : [ String ]
+    }
